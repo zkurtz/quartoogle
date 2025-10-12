@@ -1,0 +1,60 @@
+---
+title: "Example Quarto Document"
+author: "Quartoogle User"
+date: today
+format: docx
+---
+
+## Introduction
+
+This is an example Quarto document that demonstrates the capabilities of **quartoogle**.
+
+Quartoogle allows you to:
+
+- Write documents in Quarto markdown format
+- Compile them to MS Word (.docx) format
+- Upload directly to Google Drive
+- All with a single command!
+
+## Features
+
+### Easy to Use
+
+Simply run:
+
+```bash
+quartoogle example.qmd --output "My Documents"
+```
+
+### Automatic Compilation
+
+Quartoogle handles the entire workflow:
+
+1. Compiles your Quarto document using `quarto render`
+2. Authenticates with Google Drive (first time only)
+3. Creates or finds the target folder
+4. Uploads your document
+5. Provides a direct link to view it
+
+## Code Examples
+
+You can include code blocks:
+
+```python
+def hello():
+    print("Hello from Quartoogle!")
+```
+
+## Lists and Tables
+
+| Feature | Status |
+|---------|--------|
+| Quarto Support | ✓ |
+| Google Drive | ✓ |
+| Easy CLI | ✓ |
+
+## Conclusion
+
+With quartoogle, sharing Quarto documents on Google Drive is as simple as running a single command.
+
+Visit [https://github.com/zkurtz/quartoogle](https://github.com/zkurtz/quartoogle) for more information.
