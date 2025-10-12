@@ -30,7 +30,7 @@ dev = [
 quartoogle = "quartoogle.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/stringle"]
+packages = ["src/quartoogle",]
 
 [tool.pytest.ini_options]
 testpaths = ["tests",]
