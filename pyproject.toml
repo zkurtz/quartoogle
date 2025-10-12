@@ -16,10 +16,12 @@ dependencies = [
     "google-auth-oauthlib>=1.0.0",
     "google-auth-httplib2>=0.1.0",
     "google-api-python-client>=2.0.0",
+    "jupyter>=1.1.1",
 ]
 
 [dependency-groups]
 dev = [
+    "matplotlib>=3.10.7",
     "pyright>=1.1.406",
     "pytest>=8.4.2",
     "pytest-mock>=3.14.0",
@@ -30,7 +32,7 @@ dev = [
 quartoogle = "quartoogle.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/stringle"]
+packages = ["src/quartoogle",]
 
 [tool.pytest.ini_options]
 testpaths = ["tests",]
