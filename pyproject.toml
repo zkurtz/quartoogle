@@ -9,7 +9,7 @@ description = "Compile quarto docs directly to google drive"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [{name = "Zach Kurtz"}]
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 dependencies = [
     "click>=8.0.0",
     "google-auth>=2.0.0",
