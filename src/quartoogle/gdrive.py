@@ -30,7 +30,7 @@ def authenticate(credentials_path: Path) -> Any:
         RuntimeError: If authentication fails
     """
     creds = None
-    token_path = Path("token.json")
+    token_path = credentials_path.parent / "token.json"
 
     # The token.json stores the user's access and refresh tokens
     if token_path.exists():
@@ -43,8 +43,8 @@ def authenticate(credentials_path: Path) -> Any:
             logger.debug("Refreshing expired token")
             try:
                 creds.refresh(Request())
-            except Exception as e:
-                logger.warning(f"Token refresh failed: {e}. Re-authenticating...")
+            except Exception as err:
+                logger.warning(f"Token refresh failed: {err}. Re-authenticating...")
                 creds = None
 
         if not creds:
@@ -65,8 +65,7 @@ def authenticate(credentials_path: Path) -> Any:
 
         # Save the credentials for the next run
         logger.debug("Saving token for future use")
-        with open(token_path, "w") as token:
-            token.write(creds.to_json())
+        token_path.write_text(creds.to_json())
 
     try:
         service = build("drive", "v3", credentials=creds)

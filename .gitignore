@@ -209,3 +209,5 @@ __marimo__/
 # Google OAuth tokens and credentials
 token.json
 credentials.json
+
+*.docx

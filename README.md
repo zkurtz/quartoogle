@@ -2,10 +2,11 @@
 
 *Pronounced "kor-TOO-gul"*
 
-Compile quarto docs directly to Google Drive. Example:
+Compile your analytical reports directly to google docs, enabling your readers to comment directly on your work. Powered by [quarto](https://quarto.org/) and the [Google Drive API](https://developers.google.com/drive). Example:
 
 ```bash
-quartoogle example.qmd --output "My Google Drive Folder"
+quartoogle example.qmd --output "quartoogle-demo"
+```
 
 -----
 
@@ -30,7 +31,7 @@ How it works:
    - Go to https://console.cloud.google.com/
    - Create a project and enable the Google Drive API
    - Create OAuth2 credentials (Desktop app type)
-   - Download as `credentials.json`
+   - Download as `credentials.json` to `~/.config/google/drive/credentials.json` (create directories as needed). Note that if you use a different path, you must specify it in the `--credentials` argument when running `quartoogle` (see example below).
 3. Install quartoogle: We're [on pypi](https://pypi.org/project/quartoogle/), so `uv add quartoogle`. If working directly on this repo, consider using the [simplest-possible virtual environment](https://gist.github.com/zkurtz/4c61572b03e667a7596a607706463543).
 
 
