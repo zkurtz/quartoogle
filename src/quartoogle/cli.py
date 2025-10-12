@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from quartoogle import constants
 from quartoogle.gdrive import authenticate, upload_file
 from quartoogle.quarto import compile_to_docx
 
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 @click.option("--output", required=True, help="Google Drive directory name or ID where the file will be uploaded")
 @click.option(
     "--credentials",
-    default="credentials.json",
+    default=constants.CREDS_PATH,
     type=click.Path(path_type=Path),
     help="Path to Google OAuth2 credentials JSON file",
 )
