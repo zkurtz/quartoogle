@@ -1,7 +1,6 @@
 """Tests for Google Drive module."""
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 from pytest_mock import MockerFixture
