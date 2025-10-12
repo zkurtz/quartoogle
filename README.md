@@ -1,6 +1,6 @@
 # quartoogle
 
-*Pronounced "quart-oo-gul"*
+*Pronounced "kor-TOO-gul"*
 
 Compile quarto docs directly to Google Drive. Example:
 
