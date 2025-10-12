@@ -6,10 +6,9 @@ Compile quarto docs directly to Google Drive. Example:
 
 ```bash
 quartoogle example.qmd --output "My Google Drive Folder"
-```
 
-Output:
-```
+-----
+
 INFO: Compiling example.qmd to MS Word...
 INFO: Successfully compiled to: example.docx
 INFO: Authenticating with Google Drive...
