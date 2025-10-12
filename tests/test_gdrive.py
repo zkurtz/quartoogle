@@ -2,28 +2,27 @@
 
 from pathlib import Path
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 from quartoogle.gdrive import authenticate, find_or_create_folder, upload_file
 
 
-def test_authenticate_missing_credentials():
+def test_authenticate_missing_credentials(mocker):
     """Test authentication fails with missing credentials file."""
-    with patch('quartoogle.gdrive.Path.exists', return_value=False):
-        with patch('quartoogle.gdrive.Credentials.from_authorized_user_file') as mock_creds:
-            mock_creds.side_effect = FileNotFoundError()
-            
-            with pytest.raises(RuntimeError) as exc_info:
-                authenticate(Path("nonexistent.json"))
-            
-            assert "not found" in str(exc_info.value).lower()
+    mocker.patch('quartoogle.gdrive.Path.exists', return_value=False)
+    mock_creds = mocker.patch('quartoogle.gdrive.Credentials.from_authorized_user_file')
+    mock_creds.side_effect = FileNotFoundError()
+    
+    with pytest.raises(RuntimeError) as exc_info:
+        authenticate(Path("nonexistent.json"))
+    
+    assert "not found" in str(exc_info.value).lower()
 
 
-def test_find_or_create_folder_existing(tmp_path):
+def test_find_or_create_folder_existing(tmp_path, mocker):
     """Test finding an existing folder."""
-    mock_service = Mock()
-    mock_files = Mock()
-    mock_list = Mock()
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
+    mock_list = mocker.Mock()
     
     mock_list.execute.return_value = {
         'files': [{'id': 'folder123', 'name': 'TestFolder'}]
@@ -36,12 +35,12 @@ def test_find_or_create_folder_existing(tmp_path):
     assert result == 'folder123'
 
 
-def test_find_or_create_folder_new(tmp_path):
+def test_find_or_create_folder_new(tmp_path, mocker):
     """Test creating a new folder."""
-    mock_service = Mock()
-    mock_files = Mock()
-    mock_list = Mock()
-    mock_create = Mock()
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
+    mock_list = mocker.Mock()
+    mock_create = mocker.Mock()
     
     # No existing folders
     mock_list.execute.return_value = {'files': []}
@@ -58,43 +57,43 @@ def test_find_or_create_folder_new(tmp_path):
     assert result == 'newfolder123'
 
 
-def test_upload_file_with_folder_name(tmp_path):
+def test_upload_file_with_folder_name(tmp_path, mocker):
     """Test uploading file to a folder by name."""
     test_file = tmp_path / "test.docx"
     test_file.write_bytes(b"fake docx")
     
-    mock_service = Mock()
-    mock_files = Mock()
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
     
     # Mock find_or_create_folder
-    with patch('quartoogle.gdrive.find_or_create_folder') as mock_find:
-        mock_find.return_value = 'folder123'
-        
-        # Mock file creation
-        mock_create = Mock()
-        mock_create.execute.return_value = {
-            'id': 'file123',
-            'webViewLink': 'https://docs.google.com/document/d/file123/edit'
-        }
-        mock_files.create.return_value = mock_create
-        mock_service.files.return_value = mock_files
-        
-        result = upload_file(mock_service, test_file, "TestFolder")
-        
-        assert "docs.google.com" in result
-        assert "file123" in result
+    mock_find = mocker.patch('quartoogle.gdrive.find_or_create_folder')
+    mock_find.return_value = 'folder123'
+    
+    # Mock file creation
+    mock_create = mocker.Mock()
+    mock_create.execute.return_value = {
+        'id': 'file123',
+        'webViewLink': 'https://docs.google.com/document/d/file123/edit'
+    }
+    mock_files.create.return_value = mock_create
+    mock_service.files.return_value = mock_files
+    
+    result = upload_file(mock_service, test_file, "TestFolder")
+    
+    assert "docs.google.com" in result
+    assert "file123" in result
 
 
-def test_upload_file_with_folder_id(tmp_path):
+def test_upload_file_with_folder_id(tmp_path, mocker):
     """Test uploading file to a folder by ID."""
     test_file = tmp_path / "test.docx"
     test_file.write_bytes(b"fake docx")
     
-    mock_service = Mock()
-    mock_files = Mock()
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
     
     # Mock file creation
-    mock_create = Mock()
+    mock_create = mocker.Mock()
     mock_create.execute.return_value = {
         'id': 'file123',
         'webViewLink': 'https://docs.google.com/document/d/file123/edit'
