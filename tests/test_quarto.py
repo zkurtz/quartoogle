@@ -3,11 +3,12 @@
 from pathlib import Path
 
 import pytest
+from pytest_mock import MockerFixture
 
 from quartoogle.quarto import compile_to_docx
 
 
-def test_compile_to_docx_quarto_not_installed(mocker):
+def test_compile_to_docx_quarto_not_installed(mocker: MockerFixture) -> None:
     """Test that we get a proper error when quarto is not installed."""
     mock_run = mocker.patch("subprocess.run")
     mock_run.side_effect = FileNotFoundError()
@@ -18,7 +19,7 @@ def test_compile_to_docx_quarto_not_installed(mocker):
     assert "not installed" in str(exc_info.value).lower()
 
 
-def test_compile_to_docx_compilation_failure(mocker):
+def test_compile_to_docx_compilation_failure(mocker: MockerFixture) -> None:
     """Test handling of quarto compilation failure."""
     mock_run = mocker.patch("subprocess.run")
 
@@ -39,7 +40,7 @@ def test_compile_to_docx_compilation_failure(mocker):
     assert "failed" in str(exc_info.value).lower()
 
 
-def test_compile_to_docx_output_not_found(mocker):
+def test_compile_to_docx_output_not_found(mocker: MockerFixture) -> None:
     """Test handling when output file is not created."""
     mock_run = mocker.patch("subprocess.run")
 
@@ -55,7 +56,7 @@ def test_compile_to_docx_output_not_found(mocker):
     assert "not found" in str(exc_info.value).lower()
 
 
-def test_compile_to_docx_success(tmp_path, mocker):
+def test_compile_to_docx_success(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test successful compilation."""
     source = tmp_path / "test.qmd"
     source.write_text("# Test")

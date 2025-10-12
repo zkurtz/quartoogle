@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
     help="Path to Google OAuth2 credentials JSON file",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable verbose logging")
-def main(source, output, credentials, verbose) -> None:
+def main(source: Path, output: str, credentials: Path, verbose: bool) -> None:
     """Compile quarto docs directly to Google Drive."""
     # Setup logging based on verbose flag
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s: %(message)s")

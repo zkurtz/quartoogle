@@ -1,11 +1,13 @@
 """Tests for quartoogle CLI."""
 
+from pathlib import Path
+
 from click.testing import CliRunner
 
 from quartoogle.cli import main
 
 
-def test_cli_help():
+def test_cli_help() -> None:
     """Test that CLI help works."""
     runner = CliRunner()
     result = runner.invoke(main, ["--help"])
@@ -15,7 +17,7 @@ def test_cli_help():
     assert "Compile quarto docs directly to Google Drive" in result.output
 
 
-def test_cli_missing_source():
+def test_cli_missing_source() -> None:
     """Test that CLI fails when source file is missing."""
     runner = CliRunner()
     result = runner.invoke(main, ["nonexistent.qmd", "--output", "test"])
@@ -24,7 +26,7 @@ def test_cli_missing_source():
     assert result.exit_code != 0
 
 
-def test_cli_missing_output_arg():
+def test_cli_missing_output_arg() -> None:
     """Test that CLI fails when --output is not provided."""
     runner = CliRunner()
     result = runner.invoke(main, ["test.qmd"])
@@ -33,7 +35,7 @@ def test_cli_missing_output_arg():
     assert result.exit_code == 2
 
 
-def test_cli_invalid_file_extension(tmp_path):
+def test_cli_invalid_file_extension(tmp_path: Path) -> None:
     """Test that CLI fails when source file is not .qmd."""
     # Create a non-.qmd file
     test_file = tmp_path / "test.txt"
