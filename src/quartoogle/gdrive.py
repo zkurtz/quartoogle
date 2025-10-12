@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 
-def authenticate(credentials_path: Path):
+def authenticate(credentials_path: Path) -> Any:
     """Authenticate with Google Drive API.
 
     Args:
@@ -76,7 +76,7 @@ def authenticate(credentials_path: Path):
         raise RuntimeError(f"Failed to build Google Drive service: {e}")
 
 
-def find_or_create_folder(service, folder_name: str, parent_id: Optional[str] = None) -> str:
+def find_or_create_folder(service: Any, folder_name: str, parent_id: Optional[str] = None) -> str:
     """Find a folder by name or create it if it doesn't exist.
 
     Args:
@@ -103,7 +103,7 @@ def find_or_create_folder(service, folder_name: str, parent_id: Optional[str] = 
 
         # Create new folder
         logger.debug(f"Creating new folder: {folder_name}")
-        file_metadata = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
+        file_metadata: dict[str, Any] = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
         if parent_id:
             file_metadata["parents"] = [parent_id]
 
@@ -116,7 +116,7 @@ def find_or_create_folder(service, folder_name: str, parent_id: Optional[str] = 
         raise RuntimeError(f"Failed to find or create folder: {e}")
 
 
-def upload_file(service, file_path: Path, destination: str) -> str:
+def upload_file(service: Any, file_path: Path, destination: str) -> str:
     """Upload a file to Google Drive.
 
     Args:
@@ -141,7 +141,7 @@ def upload_file(service, file_path: Path, destination: str) -> str:
             folder_id = find_or_create_folder(service, destination)
 
         # Upload the file
-        file_metadata = {"name": file_path.name, "parents": [folder_id]}
+        file_metadata: dict[str, Any] = {"name": file_path.name, "parents": [folder_id]}
 
         media = MediaFileUpload(
             str(file_path),
