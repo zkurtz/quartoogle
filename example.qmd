@@ -2,16 +2,7 @@
 title: "Quartoogle Demo Report"
 author: "Quartoogle"
 date: today
-format:
-  docx:
-    reference-doc: null
-    page-width: 8.5in
-    margin-left: 1in
-    margin-right: 1in
-    margin-top: 1in
-    margin-bottom: 1in
-    font-family: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
-    fontsize: 11pt
+format: docx
 execute:
   echo: false
   warning: false
@@ -26,6 +17,7 @@ This is a demonstration of **quartoogle**, a tool for compiling Quarto documents
 ```{python}
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 # Calculate some metrics about quartoogle usage
 total_reports = 42
@@ -40,13 +32,25 @@ Here is another dynamically-generated value showing the average compile time: **
 
 ## Usage Statistics
 
-The table below shows key metrics about quartoogle usage:
+The table below shows key metrics about quartoogle usage rendered from a pandas DataFrame:
 
-| Metric | Value |
-|--------|-------|
-| Total Reports Compiled | `{python} total_reports` |
-| Reports This Month | `{python} reports_this_month` |
-| Success Rate | `{python} f"{success_rate}%"` |
+```{python}
+# Create a pandas DataFrame with usage statistics
+usage_stats = pd.DataFrame({
+    'Metric': [
+        'Total Reports Compiled',
+        'Reports This Month',
+        'Success Rate'
+    ],
+    'Value': [
+        total_reports,
+        reports_this_month,
+        f"{success_rate}%"
+    ]
+})
+
+usage_stats
+```
 
 ## Compilation Times
 

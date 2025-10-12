@@ -13,8 +13,11 @@ from googleapiclient.http import MediaFileUpload
 
 logger = logging.getLogger(__name__)
 
-# Scopes required for uploading files to Google Drive
-SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+# Scopes required for uploading files to Google Drive and modifying documents
+SCOPES = [
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/documents",
+]
 
 
 def authenticate(credentials_path: Path) -> Any:
@@ -156,9 +159,60 @@ def upload_file(service: Any, file_path: Path, destination: str) -> str:
 
         logger.debug(f"Uploaded file ID: {file_id}")
 
-        return web_view_link
+        return file_id, web_view_link
 
     except HttpError as e:
         raise RuntimeError(f"Failed to upload file: {e}")
     except Exception as e:
         raise RuntimeError(f"Upload error: {e}")
+
+
+def set_pageless_format(service: Any, file_id: str) -> None:
+    """Set the document to pageless format.
+
+    Args:
+        service: Google Drive API service object (with Docs API access)
+        file_id: ID of the document to format
+
+    Raises:
+        RuntimeError: If formatting fails
+    """
+    try:
+        # Build the Docs API service from the same credentials
+        # Get credentials from the Drive service
+        creds = service._http.credentials
+
+        # Build Docs API service
+        docs_service = build("docs", "v1", credentials=creds)
+
+        logger.debug(f"Setting document {file_id} to pageless format...")
+
+        # Update document style to use pageless format
+        requests = [
+            {
+                "updateDocumentStyle": {
+                    "documentStyle": {
+                        "useCustomHeaderFooterMargins": True,
+                        "marginTop": {"magnitude": 72, "unit": "PT"},
+                        "marginBottom": {"magnitude": 72, "unit": "PT"},
+                        "marginLeft": {"magnitude": 72, "unit": "PT"},
+                        "marginRight": {"magnitude": 72, "unit": "PT"},
+                        "pageSize": {
+                            "width": {"magnitude": 8.5, "unit": "INCH"},
+                            "height": {"magnitude": 11, "unit": "INCH"},
+                        },
+                        "useEvenPageHeaderFooter": False,
+                        "useFirstPageHeaderFooter": False,
+                    },
+                    "fields": "useCustomHeaderFooterMargins,marginTop,marginBottom,marginLeft,marginRight,pageSize",
+                }
+            }
+        ]
+
+        docs_service.documents().batchUpdate(documentId=file_id, body={"requests": requests}).execute()
+
+        logger.debug("Successfully set document to pageless format")
+
+    except Exception as e:
+        # Log warning but don't fail the upload
+        logger.warning(f"Failed to set pageless format (document still uploaded successfully): {e}")

@@ -78,10 +78,11 @@ def test_upload_file_with_folder_name(tmp_path: Path, mocker: MockerFixture) -> 
     mock_files.create.return_value = mock_create
     mock_service.files.return_value = mock_files
 
-    result = upload_file(mock_service, test_file, "TestFolder")
+    file_id, file_url = upload_file(mock_service, test_file, "TestFolder")
 
-    assert "docs.google.com" in result
-    assert "file123" in result
+    assert file_id == "file123"
+    assert "docs.google.com" in file_url
+    assert "file123" in file_url
 
 
 def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -102,6 +103,7 @@ def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> No
     mock_service.files.return_value = mock_files
 
     # Use a long alphanumeric string as folder ID
-    result = upload_file(mock_service, test_file, "a1b2c3d4e5f6g7h8i9j0k1")
+    file_id, file_url = upload_file(mock_service, test_file, "a1b2c3d4e5f6g7h8i9j0k1")
 
-    assert "docs.google.com" in result
+    assert file_id == "file123"
+    assert "docs.google.com" in file_url
