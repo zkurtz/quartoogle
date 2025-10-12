@@ -18,28 +18,22 @@ INFO: Upload complete!
 INFO: View your document at: https://docs.google.com/document/d/DOCUMENT_ID/edit
 ```
 
-## Features
+How it works:
+- Renders `.qmd` files to MS Word format
+- Uploads directly to the specified folder in your Google Drive, creating the folder if it does not exist
+- Uses OAuth2 authentication (Secure authentication with token caching)
 
-- **Quarto compilation** - Automatically renders `.qmd` files to MS Word format
-- **Google Drive integration** - Uploads directly to your Google Drive
-- **OAuth2 authentication** - Secure authentication with token caching
-- **Automatic folder creation** - Creates target folders if they don't exist
-- **Verbose logging** - Optional `-v` flag for detailed output
 
-## Installation
+## Set up
 
-```bash
-pip install -e .
-```
-
-## Prerequisites
-
-1. **Quarto** - Install from https://quarto.org/docs/get-started/
-2. **Google OAuth2 credentials**:
+1. Install quarto from https://quarto.org/docs/get-started/
+2. Setup google OAuth2 credentials:
    - Go to https://console.cloud.google.com/
    - Create a project and enable the Google Drive API
    - Create OAuth2 credentials (Desktop app type)
    - Download as `credentials.json`
+3. Install quartoogle: We're [on pypi](https://pypi.org/project/quartoogle/), so `uv add quartoogle`. If working directly on this repo, consider using the [simplest-possible virtual environment](https://gist.github.com/zkurtz/4c61572b03e667a7596a607706463543).
+
 
 ## Usage Examples
 
@@ -48,12 +42,13 @@ Basic usage:
 quartoogle report.qmd --output "Reports"
 ```
 
+Verbose mode:
+```bash
+quartoogle report.qmd --output "Reports" -v
+```
+
 Custom credentials file:
 ```bash
 quartoogle report.qmd --output "Reports" --credentials path/to/credentials.json
 ```
 
-Verbose mode:
-```bash
-quartoogle report.qmd --output "Reports" -v
-```
