@@ -189,7 +189,7 @@ def set_pageless_format(service: Any, file_id: str) -> None:
 
         # Get the current document to check if it exists
         docs_service.documents().get(documentId=file_id).execute()
-        
+
         # Update document style to use pageless format
         # Pageless format in Google Docs is achieved by setting useCustomHeaderFooterMargins to False
         # and not specifying page size, which allows content to flow continuously
