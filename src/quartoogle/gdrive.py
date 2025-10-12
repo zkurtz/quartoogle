@@ -118,7 +118,7 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: Optional[st
         raise RuntimeError(f"Failed to find or create folder: {e}")
 
 
-def upload_file(service: Any, file_path: Path, destination: str) -> str:
+def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, str]:
     """Upload a file to Google Drive.
 
     Args:
@@ -127,7 +127,7 @@ def upload_file(service: Any, file_path: Path, destination: str) -> str:
         destination: Destination folder name or ID
 
     Returns:
-        URL to view the uploaded file
+        Tuple of (file_id, web_view_link) for the uploaded file
 
     Raises:
         RuntimeError: If upload fails
@@ -187,24 +187,23 @@ def set_pageless_format(service: Any, file_id: str) -> None:
 
         logger.debug(f"Setting document {file_id} to pageless format...")
 
+        # Get the current document to check if it exists
+        docs_service.documents().get(documentId=file_id).execute()
+        
         # Update document style to use pageless format
+        # Pageless format in Google Docs is achieved by setting useCustomHeaderFooterMargins to False
+        # and not specifying page size, which allows content to flow continuously
         requests = [
             {
                 "updateDocumentStyle": {
                     "documentStyle": {
-                        "useCustomHeaderFooterMargins": True,
+                        "useCustomHeaderFooterMargins": False,
                         "marginTop": {"magnitude": 72, "unit": "PT"},
                         "marginBottom": {"magnitude": 72, "unit": "PT"},
                         "marginLeft": {"magnitude": 72, "unit": "PT"},
                         "marginRight": {"magnitude": 72, "unit": "PT"},
-                        "pageSize": {
-                            "width": {"magnitude": 8.5, "unit": "INCH"},
-                            "height": {"magnitude": 11, "unit": "INCH"},
-                        },
-                        "useEvenPageHeaderFooter": False,
-                        "useFirstPageHeaderFooter": False,
                     },
-                    "fields": "useCustomHeaderFooterMargins,marginTop,marginBottom,marginLeft,marginRight,pageSize",
+                    "fields": "useCustomHeaderFooterMargins,marginTop,marginBottom,marginLeft,marginRight",
                 }
             }
         ]
