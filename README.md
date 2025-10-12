@@ -1,5 +1,7 @@
 # quartoogle
 
+*Pronounced "quart-oo-gul"*
+
 Compile quarto docs directly to Google Drive. Example:
 
 ```bash
