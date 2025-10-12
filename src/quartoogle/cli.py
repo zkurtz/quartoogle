@@ -7,7 +7,7 @@ from pathlib import Path
 import click
 
 from quartoogle import constants
-from quartoogle.gdrive import authenticate, upload_file
+from quartoogle.gdrive import authenticate, set_pageless_format, upload_file
 from quartoogle.quarto import compile_to_docx
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,10 @@ def main(source: Path, output: str, credentials: Path, verbose: bool) -> None:
         service = authenticate(credentials)
 
         logger.info(f"Uploading to Google Drive directory: {output}")
-        file_url = upload_file(service, docx_path, output)
+        file_id, file_url = upload_file(service, docx_path, output)
+
+        logger.info("Setting document to pageless format...")
+        set_pageless_format(service, file_id)
 
         logger.info("Upload complete!")
         logger.info(f"View your document at: {file_url}")

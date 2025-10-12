@@ -1,80 +1,77 @@
 ---
-title: "Sales Analysis Report"
-author: "Data Analyst"
+title: "Quartoogle Demo Report"
+author: "Quartoogle"
 date: today
 format: docx
+execute:
+  echo: false
+  warning: false
 ---
 
-## Executive Summary
+## About This Report
 
-This report analyzes quarterly sales data for Q1-Q4 2024. Total revenue reached **$2.4M**, representing a 15% increase year-over-year.
+This is a demonstration of **quartoogle**, a tool for compiling Quarto documents directly to Google Drive. This report was generated dynamically using Python code, and all values you see below are computed at render time.
 
-## Data Analysis
+## Dynamic Calculations
 
 ```{python}
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
-# Quarterly sales data (in thousands)
-quarters = ['Q1', 'Q2', 'Q3', 'Q4']
-revenue = [520, 580, 650, 650]
-costs = [320, 350, 380, 390]
-profit = [r - c for r, c in zip(revenue, costs)]
-
-# Calculate key metrics
-total_revenue = sum(revenue)
-total_profit = sum(profit)
-profit_margin = (total_profit / total_revenue) * 100
-
-print(f"Total Revenue: ${total_revenue}K")
-print(f"Total Profit: ${total_profit}K")
-print(f"Average Profit Margin: {profit_margin:.1f}%")
+# Calculate some metrics about quartoogle usage
+total_reports = 42
+reports_this_month = 7
+success_rate = 98.5
+avg_compile_time = 2.3
 ```
 
-The analysis shows that our average profit margin for 2024 was `{python} f"{profit_margin:.1f}%"`, with total profit of `{python} f"${total_profit}K"`.
+Here is a dynamically-generated value showing reports compiled this month: **`{python} reports_this_month`**
 
-## Quarterly Performance
+Here is another dynamically-generated value showing the average compile time: **`{python} f"{avg_compile_time:.1f} seconds"`**
+
+## Usage Statistics
+
+The table below shows key metrics about quartoogle usage rendered from a pandas DataFrame:
 
 ```{python}
-#| label: fig-quarterly
-#| fig-cap: "Quarterly Revenue, Costs, and Profit"
+# Create a pandas DataFrame with usage statistics
+usage_stats = pd.DataFrame({
+    'Metric': [
+        'Total Reports Compiled',
+        'Reports This Month',
+        'Success Rate'
+    ],
+    'Value': [
+        total_reports,
+        reports_this_month,
+        f"{success_rate}%"
+    ]
+})
 
-fig, ax = plt.subplots(figsize=(10, 6))
+usage_stats
+```
 
-x = np.arange(len(quarters))
-width = 0.25
+## Compilation Times
 
-ax.bar(x - width, revenue, width, label='Revenue', color='#2E86AB')
-ax.bar(x, costs, width, label='Costs', color='#A23B72')
-ax.bar(x + width, profit, width, label='Profit', color='#F18F01')
+```{python}
+#| label: fig-compile-times
+#| fig-cap: "Recent Compilation Times"
 
-ax.set_xlabel('Quarter')
-ax.set_ylabel('Amount ($K)')
-ax.set_title('2024 Quarterly Financial Performance')
-ax.set_xticks(x)
-ax.set_xticklabels(quarters)
-ax.legend()
-ax.grid(axis='y', alpha=0.3)
+# Generate sample compilation times
+compile_times = [2.1, 2.5, 1.9, 2.8, 2.2, 2.4, 2.0]
+report_numbers = list(range(1, len(compile_times) + 1))
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(report_numbers, compile_times, marker='o', linewidth=2, markersize=6, color='#FF6B35')
+ax.set_xlabel('Report Number')
+ax.set_ylabel('Compile Time (seconds)')
+ax.set_title('Quartoogle Compilation Performance')
+ax.grid(axis='y', alpha=0.3, linestyle='--')
+ax.set_ylim(0, max(compile_times) * 1.2)
 
 plt.tight_layout()
 plt.show()
 ```
 
-Q4 showed the strongest performance with revenue of $650K and profit of `{python} f"${profit[3]}K"`, maintaining our highest profit margin of the year.
-
-## Summary Statistics
-
-| Metric | Value |
-|--------|-------|
-| Total Revenue | $2.4M |
-| Total Profit | $1.0M |
-| Avg Profit Margin | 42.5% |
-| Best Quarter | Q3/Q4 (tied) |
-
-## Recommendations
-
-Based on the analysis, we recommend:
-
-1. Maintain cost control strategies that achieved the 42.5% profit margin
-2. Invest in scaling operations to sustain Q3/Q4 revenue levels
-3. Focus on customer retention to build on strong Q4 performance
+As shown in the chart above, quartoogle maintains consistent compilation times, with most reports compiling in under 3 seconds.
