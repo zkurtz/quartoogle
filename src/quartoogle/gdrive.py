@@ -119,7 +119,7 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
         raise RuntimeError(f"Failed to find or create folder: {e}")
 
 
-def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, str]:
+def upload_file(service: Any, file_path: Path, folder_id: str) -> tuple[str, str]:
     """Upload a file to Google Drive with a timestamp suffix.
 
     The file will be uploaded with a timestamp appended to the filename in the format:
@@ -129,7 +129,7 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
     Args:
         service: Google Drive API service object
         file_path: Path to the file to upload
-        destination: Destination folder name or ID
+        folder_id: Google Drive folder ID (not name) where the file will be uploaded
 
     Returns:
         Tuple of (file_id, web_view_link) for the uploaded file
@@ -138,14 +138,8 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
         RuntimeError: If upload fails
     """
     try:
-        # Determine if destination is an ID or name
-        # IDs are typically long alphanumeric strings
-        if len(destination) > 20 and destination.isalnum():
-            folder_id = destination
-            logger.debug(f"Using destination as folder ID: {folder_id}")
-        else:
-            # Treat as folder name, find or create it
-            folder_id = find_or_create_folder(service, destination)
+        # Use the provided folder_id directly
+        logger.debug(f"Using folder ID: {folder_id}")
 
         # Upload the file with timestamp suffix
         # Generate timestamp in format: YYYY-MM-DD_HH-MM

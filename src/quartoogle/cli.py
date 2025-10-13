@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument("source", type=click.Path(exists=True, path_type=Path))
-@click.option("--output", required=True, help="Google Drive directory name or ID where the file will be uploaded")
+@click.option("--folder-id", required=True, help="Google Drive folder ID where the file will be uploaded")
 @click.option(
     "--to",
     "output_format",
@@ -28,14 +28,14 @@ logger = logging.getLogger(__name__)
     help="Path to Google OAuth2 credentials JSON file",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable verbose logging")
-def main(source: Path, output: str, output_format: str, credentials: Path, verbose: bool) -> None:
+def main(source: Path, folder_id: str, output_format: str, credentials: Path, verbose: bool) -> None:
     """Compile quarto docs directly to Google Drive."""
     # Setup logging based on verbose flag
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s: %(message)s")
 
     try:
         # Use the publish API function
-        publish(source, output, output_format, credentials)
+        publish(source, folder_id, output_format, credentials)
 
     except KeyboardInterrupt:
         logger.info("\nOperation cancelled by user")
