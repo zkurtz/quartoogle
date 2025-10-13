@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Scopes required for uploading files to Google Drive
 SCOPES = [
-    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/drive",
 ]
 
 
@@ -96,7 +96,17 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
         if parent_id:
             query += f" and '{parent_id}' in parents"
 
-        results = service.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
+        results = (
+            service.files()
+            .list(
+                q=query,
+                spaces="drive",
+                fields="files(id, name)",
+                supportsAllDrives=True,  # ADD THIS
+                includeItemsFromAllDrives=True,  # ADD THIS
+            )
+            .execute()
+        )
 
         items = results.get("files", [])
 
@@ -110,7 +120,15 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
         if parent_id:
             file_metadata["parents"] = [parent_id]
 
-        folder = service.files().create(body=file_metadata, fields="id").execute()
+        folder = (
+            service.files()
+            .create(
+                body=file_metadata,
+                fields="id",
+                supportsAllDrives=True,  # ADD THIS
+            )
+            .execute()
+        )
 
         logger.debug(f"Created folder with ID: {folder['id']}")
         return folder["id"]
@@ -168,7 +186,16 @@ def upload_file(service: Any, file_path: Path, folder_id: str) -> tuple[str, str
         )
 
         logger.debug(f"Uploading {file_path.name} as {timestamped_name}...")
-        file = service.files().create(body=file_metadata, media_body=media, fields="id, webViewLink").execute()
+        file = (
+            service.files()
+            .create(
+                body=file_metadata,
+                media_body=media,
+                fields="id, webViewLink",
+                supportsAllDrives=True,  # ADD THIS
+            )
+            .execute()
+        )
 
         file_id = file.get("id")
         web_view_link = file.get("webViewLink")

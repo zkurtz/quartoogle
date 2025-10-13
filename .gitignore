@@ -211,3 +211,4 @@ token.json
 credentials.json
 
 *.docx
+*.pdf

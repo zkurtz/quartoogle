@@ -34,7 +34,7 @@ Here is another dynamically-generated value showing the average compile time: **
 The table below shows key metrics about quartoogle usage rendered from a pandas DataFrame:
 
 ```{python}
-from great_tables import GT
+from tabulate import tabulate
 
 # Create a pandas DataFrame with usage statistics
 usage_stats = pd.DataFrame({
@@ -50,7 +50,7 @@ usage_stats = pd.DataFrame({
     ]
 })
 
-GT(usage_stats).render()
+print(tabulate(usage_stats, headers="keys", tablefmt="github"))
 ```
 
 ## Compilation Times
