@@ -2,9 +2,6 @@
 title: "Quartoogle Demo Report"
 author: "Quartoogle"
 date: today
-format:
-  docx:
-    df-print: kable
 execute:
   echo: false
   warning: false
@@ -37,7 +34,6 @@ Here is another dynamically-generated value showing the average compile time: **
 The table below shows key metrics about quartoogle usage rendered from a pandas DataFrame:
 
 ```{python}
-#| output: asis
 from great_tables import GT
 
 # Create a pandas DataFrame with usage statistics
@@ -54,11 +50,7 @@ usage_stats = pd.DataFrame({
     ]
 })
 
-GT(usage_stats).tab_header(title="Usage Statistics")
-```
-Again:
-```{python}
-usage_stats
+GT(usage_stats).render()
 ```
 
 ## Compilation Times
