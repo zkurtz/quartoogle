@@ -2,9 +2,39 @@
 
 from pathlib import Path
 
+import pytest
 from pytest_mock import MockerFixture
 
-from quartoogle.gdrive import find_or_create_folder, upload_file
+from quartoogle.gdrive import find_or_create_folder, get_drive_service, upload_file
+
+
+def test_get_drive_service_missing_credentials(mocker: MockerFixture) -> None:
+    """Test get_drive_service fails with missing credentials file."""
+    mocker.patch("quartoogle.gdrive.Path.exists", return_value=False)
+
+    with pytest.raises(RuntimeError) as exc_info:
+        get_drive_service(Path("nonexistent.json"))
+
+    assert "not found" in str(exc_info.value).lower()
+
+
+def test_get_drive_service_creates_service(mocker: MockerFixture) -> None:
+    """Test get_drive_service creates Drive service."""
+    mock_creds = mocker.Mock()
+    mock_creds.valid = True
+
+    mocker.patch("quartoogle.gdrive.Path.exists", return_value=True)
+    mocker.patch("quartoogle.gdrive.OAuth2Credentials.from_authorized_user_file", return_value=mock_creds)
+    mock_build = mocker.patch("quartoogle.gdrive.build")
+
+    mock_drive_service = mocker.Mock()
+    mock_build.return_value = mock_drive_service
+
+    drive_service = get_drive_service(Path("/fake/credentials.json"))
+
+    # Verify build was called with correct parameters
+    mock_build.assert_called_once_with("drive", "v3", credentials=mock_creds)
+    assert drive_service == mock_drive_service
 
 
 def test_find_or_create_folder_existing(tmp_path: Path, mocker: MockerFixture) -> None:

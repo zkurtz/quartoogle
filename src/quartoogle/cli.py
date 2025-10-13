@@ -7,8 +7,7 @@ from pathlib import Path
 import click
 
 from quartoogle import constants
-from quartoogle.gdrive import upload_file
-from quartoogle.google import Services
+from quartoogle.gdrive import get_drive_service, upload_file
 from quartoogle.quarto import compile_to_docx
 
 logger = logging.getLogger(__name__)
@@ -40,10 +39,10 @@ def main(source: Path, output: str, credentials: Path, verbose: bool) -> None:
         logger.info(f"Successfully compiled to: {docx_path}")
 
         logger.info("Authenticating with Google Drive...")
-        services = Services(credentials)
+        drive_service = get_drive_service(credentials)
 
         logger.info(f"Uploading to Google Drive directory: {output}")
-        file_id, file_url = upload_file(services.drive, docx_path, output)
+        file_id, file_url = upload_file(drive_service, docx_path, output)
 
         logger.info("Upload complete!")
         logger.info(f"View your document at: {file_url}")
