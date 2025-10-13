@@ -1,6 +1,7 @@
 """Google Drive API utilities."""
 
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -51,7 +52,11 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: Optional[st
 
 
 def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, str]:
-    """Upload a file to Google Drive.
+    """Upload a file to Google Drive with a timestamp suffix.
+
+    The file will be uploaded with a timestamp appended to the filename in the format:
+    [basename]_YYYY-MM-DD_HH-MM[extension], e.g., "report_2025-10-13_08-01.docx".
+    The timestamp is in the local time zone of the system executing the upload.
 
     Args:
         service: Google Drive API service object
@@ -74,8 +79,16 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
             # Treat as folder name, find or create it
             folder_id = find_or_create_folder(service, destination)
 
-        # Upload the file
-        file_metadata: dict[str, Any] = {"name": file_path.name, "parents": [folder_id]}
+        # Upload the file with timestamp suffix
+        # Generate timestamp in format: YYYY-MM-DD_HH-MM
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        
+        # Add timestamp before file extension
+        file_stem = file_path.stem  # filename without extension
+        file_suffix = file_path.suffix  # extension with dot
+        timestamped_name = f"{file_stem}_{timestamp}{file_suffix}"
+        
+        file_metadata: dict[str, Any] = {"name": timestamped_name, "parents": [folder_id]}
 
         media = MediaFileUpload(
             str(file_path),
