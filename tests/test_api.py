@@ -22,7 +22,7 @@ def test_publish_success(tmp_path: Path, mocker: MockerFixture) -> None:
     # Create a .qmd file
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
-    
+
     # Create a fake compiled output
     pdf = tmp_path / "test.pdf"
     pdf.write_bytes(b"fake pdf")
@@ -44,7 +44,7 @@ def test_publish_success(tmp_path: Path, mocker: MockerFixture) -> None:
     # Verify the results
     assert file_id == "file123"
     assert "file123" in file_url
-    
+
     # Verify the mocks were called correctly
     mock_compile.assert_called_once_with(source, "pdf")
     mock_get_service.assert_called_once()
@@ -56,7 +56,7 @@ def test_publish_with_custom_format(tmp_path: Path, mocker: MockerFixture) -> No
     # Create a .qmd file
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
-    
+
     # Create a fake compiled output
     docx = tmp_path / "test.docx"
     docx.write_bytes(b"fake docx")
@@ -84,10 +84,10 @@ def test_publish_with_custom_credentials(tmp_path: Path, mocker: MockerFixture) 
     # Create a .qmd file
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
-    
+
     # Create fake credentials path
     creds = tmp_path / "custom_creds.json"
-    
+
     # Create a fake compiled output
     pdf = tmp_path / "test.pdf"
     pdf.write_bytes(b"fake pdf")
@@ -115,7 +115,7 @@ def test_publish_with_string_paths(tmp_path: Path, mocker: MockerFixture) -> Non
     # Create a .qmd file
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
-    
+
     # Create a fake compiled output
     pdf = tmp_path / "test.pdf"
     pdf.write_bytes(b"fake pdf")
