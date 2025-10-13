@@ -7,14 +7,15 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def compile_to_docx(source_path: Path) -> Path:
-    """Compile a quarto source file to MS Word format.
+def compile_quarto(source_path: Path, output_format: str = "pdf") -> Path:
+    """Compile a quarto source file to the specified format.
 
     Args:
         source_path: Path to the .qmd source file
+        output_format: Output format (e.g., 'pdf', 'docx', 'html'). Default is 'pdf'.
 
     Returns:
-        Path to the generated .docx file
+        Path to the generated output file
 
     Raises:
         RuntimeError: If quarto is not installed or compilation fails
@@ -29,11 +30,11 @@ def compile_to_docx(source_path: Path) -> Path:
     except subprocess.TimeoutExpired:
         logger.warning("Quarto check timed out, continuing anyway")
 
-    # Compile the source file to docx
-    logger.debug(f"Running: quarto render {source_path} --to docx")
+    # Compile the source file to the specified format
+    logger.debug(f"Running: quarto render {source_path} --to {output_format}")
     try:
         result = subprocess.run(
-            ["quarto", "render", str(source_path), "--to", "docx"],
+            ["quarto", "render", str(source_path), "--to", output_format],
             capture_output=True,
             text=True,
             timeout=300,  # 5 minutes timeout
@@ -51,10 +52,29 @@ def compile_to_docx(source_path: Path) -> Path:
     except Exception as e:
         raise RuntimeError(f"Failed to run quarto: {e}")
 
-    # Determine output path (quarto creates .docx next to source)
-    docx_path = source_path.with_suffix(".docx")
+    # Determine output path (quarto creates output file next to source)
+    output_path = source_path.with_suffix(f".{output_format}")
 
-    if not docx_path.exists():
-        raise RuntimeError(f"Expected output file not found: {docx_path}")
+    if not output_path.exists():
+        raise RuntimeError(f"Expected output file not found: {output_path}")
 
-    return docx_path
+    return output_path
+
+
+def compile_to_docx(source_path: Path) -> Path:
+    """Compile a quarto source file to MS Word format.
+
+    This function is maintained for backward compatibility.
+    Use compile_quarto() for new code.
+
+    Args:
+        source_path: Path to the .qmd source file
+
+    Returns:
+        Path to the generated .docx file
+
+    Raises:
+        RuntimeError: If quarto is not installed or compilation fails
+    """
+    return compile_quarto(source_path, "docx")
+
