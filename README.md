@@ -9,8 +9,8 @@ quartoogle example.qmd --output "quartoogle-demo"
 
 -----
 
-INFO: Compiling example.qmd to MS Word...
-INFO: Successfully compiled to: example.docx
+INFO: Compiling example.qmd to pdf...
+INFO: Successfully compiled to: example.pdf
 INFO: Authenticating with Google Drive...
 INFO: Uploading to Google Drive directory: My Google Drive Folder
 INFO: Upload complete!
@@ -18,7 +18,7 @@ INFO: View your document at: https://docs.google.com/document/d/DOCUMENT_ID/edit
 ```
 
 How it works:
-- Renders `.qmd` files to MS Word format
+- Renders `.qmd` files to PDF format by default (or any other quarto format via the `--to` option)
 - Uploads directly to the specified folder in your Google Drive, creating the folder if it does not exist
 - Uses OAuth2 authentication (Secure authentication with token caching)
 
@@ -36,9 +36,19 @@ How it works:
 
 ## Usage Examples
 
-Basic usage:
+Basic usage (PDF output by default):
 ```bash
 quartoogle report.qmd --output "Reports"
+```
+
+Compile to MS Word format:
+```bash
+quartoogle report.qmd --output "Reports" --to docx
+```
+
+Compile to HTML format:
+```bash
+quartoogle report.qmd --output "Reports" --to html
 ```
 
 Verbose mode:

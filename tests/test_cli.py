@@ -35,6 +35,21 @@ def test_cli_missing_output_arg() -> None:
     assert result.exit_code == 2
 
 
+def test_cli_with_to_option(tmp_path: Path) -> None:
+    """Test that CLI accepts --to option for format."""
+    # Create a .qmd file
+    test_file = tmp_path / "test.qmd"
+    test_file.write_text("# Test")
+
+    runner = CliRunner()
+    result = runner.invoke(main, [str(test_file), "--output", "test", "--to", "html"])
+
+    # Should fail (no real quarto/google creds) but should accept the --to option
+    # The error should not be about the --to option
+    assert "--to" not in result.output or result.exit_code != 2
+
+
+
 def test_cli_invalid_file_extension(tmp_path: Path) -> None:
     """Test that CLI fails when source file is not .qmd."""
     # Create a non-.qmd file
