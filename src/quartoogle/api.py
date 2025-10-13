@@ -47,7 +47,7 @@ def publish(
 
     # Validate source file extension
     if source_path.suffix != ".qmd":
-        raise ValueError(f"Source file must be a .qmd file, got: {source_path.suffix}")
+        raise ValueError(f"Source file must be a .qmd file, got: {source_path}")
 
     # Compile the quarto document
     logger.info(f"Compiling {source_path} to {output_format}...")
