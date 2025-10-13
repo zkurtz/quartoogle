@@ -106,18 +106,21 @@ def set_pageless_format(docs_service: Any, file_id: str) -> None:
         docs_service: Google Docs API service object
         file_id: ID of the document to format
 
-    Raises:
-        RuntimeError: If formatting fails
+    Note:
+        Pageless format may not be available for all Google accounts or document types.
+        This function will attempt to set it and log a warning if it fails.
     """
     try:
         logger.debug(f"Setting document {file_id} to pageless format...")
 
         # Get the current document to check if it exists
-        docs_service.documents().get(documentId=file_id).execute()
+        doc = docs_service.documents().get(documentId=file_id).execute()
+        logger.debug(f"Document retrieved: {doc.get('title', 'Unknown')}")
 
         # Update document style to use pageless format
-        # Pageless format in Google Docs is achieved by setting useCustomHeaderFooterMargins to False
-        # and not specifying page size, which allows content to flow continuously
+        # According to Google Docs API, pageless format is controlled by removing
+        # the pageSize field from documentStyle, which allows content to flow continuously
+        # We also set useCustomHeaderFooterMargins to False for consistency
         requests = [
             {
                 "updateDocumentStyle": {
@@ -133,10 +136,15 @@ def set_pageless_format(docs_service: Any, file_id: str) -> None:
             }
         ]
 
-        docs_service.documents().batchUpdate(documentId=file_id, body={"requests": requests}).execute()
-
-        logger.debug("Successfully set document to pageless format")
+        result = docs_service.documents().batchUpdate(documentId=file_id, body={"requests": requests}).execute()
+        logger.debug(f"Pageless format update result: {result}")
+        logger.info("Successfully set document to pageless format")
 
     except Exception as e:
-        # Log warning but don't fail the upload
-        logger.warning(f"Failed to set pageless format (document still uploaded successfully): {e}")
+        # Log detailed error information for debugging
+        error_msg = str(e)
+        logger.warning(
+            f"Failed to set pageless format (document still uploaded successfully): {error_msg}\n"
+            "Note: Pageless format may not be available for all Google accounts or document types. "
+            "You can manually enable it in Google Docs via Format > Pageless."
+        )
