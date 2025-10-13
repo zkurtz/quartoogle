@@ -8,7 +8,7 @@ import click
 
 from quartoogle import constants
 from quartoogle.gdrive import get_drive_service, upload_file
-from quartoogle.quarto import compile_to_docx
+from quartoogle.quarto import compile_quarto
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +17,19 @@ logger = logging.getLogger(__name__)
 @click.argument("source", type=click.Path(exists=True, path_type=Path))
 @click.option("--output", required=True, help="Google Drive directory name or ID where the file will be uploaded")
 @click.option(
+    "--to",
+    "output_format",
+    default="pdf",
+    help="Output format (e.g., pdf, docx, html). Default is pdf.",
+)
+@click.option(
     "--credentials",
     default=constants.CREDS_PATH,
     type=click.Path(path_type=Path),
     help="Path to Google OAuth2 credentials JSON file",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable verbose logging")
-def main(source: Path, output: str, credentials: Path, verbose: bool) -> None:
+def main(source: Path, output: str, output_format: str, credentials: Path, verbose: bool) -> None:
     """Compile quarto docs directly to Google Drive."""
     # Setup logging based on verbose flag
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s: %(message)s")
@@ -34,15 +40,15 @@ def main(source: Path, output: str, credentials: Path, verbose: bool) -> None:
             logger.error(f"Source file must be a .qmd file, got: {source.suffix}")
             sys.exit(1)
 
-        logger.info(f"Compiling {source} to MS Word...")
-        docx_path = compile_to_docx(source)
-        logger.info(f"Successfully compiled to: {docx_path}")
+        logger.info(f"Compiling {source} to {output_format}...")
+        output_path = compile_quarto(source, output_format)
+        logger.info(f"Successfully compiled to: {output_path}")
 
         logger.info("Authenticating with Google Drive...")
         drive_service = get_drive_service(credentials)
 
         logger.info(f"Uploading to Google Drive directory: {output}")
-        file_id, file_url = upload_file(drive_service, docx_path, output)
+        file_id, file_url = upload_file(drive_service, output_path, output)
 
         logger.info("Upload complete!")
         logger.info(f"View your document at: {file_url}")

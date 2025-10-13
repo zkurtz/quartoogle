@@ -158,9 +158,18 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
 
         file_metadata: dict[str, Any] = {"name": timestamped_name, "parents": [folder_id]}
 
+        # Determine MIME type based on file extension
+        mime_types = {
+            ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".pdf": "application/pdf",
+            ".html": "text/html",
+            ".htm": "text/html",
+        }
+        mime_type = mime_types.get(file_path.suffix.lower(), "application/octet-stream")
+
         media = MediaFileUpload(
             str(file_path),
-            mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            mimetype=mime_type,
             resumable=True,
         )
 
