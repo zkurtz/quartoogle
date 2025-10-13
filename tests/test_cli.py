@@ -49,7 +49,6 @@ def test_cli_with_to_option(tmp_path: Path) -> None:
     assert "--to" not in result.output or result.exit_code != 2
 
 
-
 def test_cli_invalid_file_extension(tmp_path: Path) -> None:
     """Test that CLI fails when source file is not .qmd."""
     # Create a non-.qmd file

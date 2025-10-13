@@ -97,4 +97,3 @@ def test_compile_to_docx_backward_compatibility(tmp_path: Path, mocker: MockerFi
     assert result.exists()
     # Verify render was called with docx format
     mock_render.assert_called_once_with(str(source), output_format="docx")
-

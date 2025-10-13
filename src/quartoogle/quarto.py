@@ -49,4 +49,3 @@ def compile_to_docx(source_path: Path) -> Path:
         RuntimeError: If quarto is not installed or compilation fails
     """
     return compile_quarto(source_path, "docx")
-
