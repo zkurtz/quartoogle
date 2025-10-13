@@ -124,14 +124,14 @@ def test_upload_file_adds_timestamp_to_name(tmp_path: Path, mocker: MockerFixtur
     mock_files.create.assert_called_once()
     call_args = mock_files.create.call_args
     file_metadata = call_args.kwargs["body"]
-    
+
     # Check that the name has timestamp format: report_YYYY-MM-DD_HH-MM.docx
     import re
+
     pattern = r"^report_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.docx$"
     assert re.match(pattern, file_metadata["name"]), f"Expected timestamp format, got: {file_metadata['name']}"
-    
+
     # Verify the name starts with the original stem
     assert file_metadata["name"].startswith("report_")
     # Verify it ends with the correct extension
     assert file_metadata["name"].endswith(".docx")
-

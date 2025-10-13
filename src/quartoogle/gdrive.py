@@ -82,12 +82,12 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
         # Upload the file with timestamp suffix
         # Generate timestamp in format: YYYY-MM-DD_HH-MM
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
-        
+
         # Add timestamp before file extension
         file_stem = file_path.stem  # filename without extension
         file_suffix = file_path.suffix  # extension with dot
         timestamped_name = f"{file_stem}_{timestamp}{file_suffix}"
-        
+
         file_metadata: dict[str, Any] = {"name": timestamped_name, "parents": [folder_id]}
 
         media = MediaFileUpload(
