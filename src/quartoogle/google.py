@@ -6,8 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import attrs
+from google.auth.credentials import Credentials
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from google.oauth2.credentials import Credentials as OAuth2Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
@@ -43,13 +44,13 @@ class Services:
         Raises:
             RuntimeError: If authentication fails
         """
-        creds = None
+        creds: Credentials | None = None
         token_path = self.credentials_path.parent / "token.json"
 
         # The token.json stores the user's access and refresh tokens
         if token_path.exists():
             logger.debug("Loading existing token")
-            creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
+            creds = OAuth2Credentials.from_authorized_user_file(str(token_path), SCOPES)
 
         # If there are no (valid) credentials available, let the user log in
         if not creds or not creds.valid:
