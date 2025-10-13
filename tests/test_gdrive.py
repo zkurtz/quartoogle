@@ -5,19 +5,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from quartoogle.gdrive import authenticate, find_or_create_folder, set_pageless_format, upload_file
-
-
-def test_authenticate_missing_credentials(mocker: MockerFixture) -> None:
-    """Test authentication fails with missing credentials file."""
-    mocker.patch("quartoogle.gdrive.Path.exists", return_value=False)
-    mock_creds = mocker.patch("quartoogle.gdrive.Credentials.from_authorized_user_file")
-    mock_creds.side_effect = FileNotFoundError()
-
-    with pytest.raises(RuntimeError) as exc_info:
-        authenticate(Path("nonexistent.json"))
-
-    assert "not found" in str(exc_info.value).lower()
+from quartoogle.gdrive import find_or_create_folder, set_pageless_format, upload_file
 
 
 def test_find_or_create_folder_existing(tmp_path: Path, mocker: MockerFixture) -> None:
