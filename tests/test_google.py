@@ -27,7 +27,7 @@ def test_services_drive_property(mocker: MockerFixture) -> None:
     mock_creds.valid = True
 
     mocker.patch("quartoogle.google.Path.exists", return_value=True)
-    mocker.patch("quartoogle.google.Credentials.from_authorized_user_file", return_value=mock_creds)
+    mocker.patch("quartoogle.google.OAuth2Credentials.from_authorized_user_file", return_value=mock_creds)
     mock_build = mocker.patch("quartoogle.google.build")
 
     mock_drive_service = mocker.Mock()
@@ -47,7 +47,7 @@ def test_services_docs_property(mocker: MockerFixture) -> None:
     mock_creds.valid = True
 
     mocker.patch("quartoogle.google.Path.exists", return_value=True)
-    mocker.patch("quartoogle.google.Credentials.from_authorized_user_file", return_value=mock_creds)
+    mocker.patch("quartoogle.google.OAuth2Credentials.from_authorized_user_file", return_value=mock_creds)
     mock_build = mocker.patch("quartoogle.google.build")
 
     mock_docs_service = mocker.Mock()
@@ -67,7 +67,9 @@ def test_services_cached_properties(mocker: MockerFixture) -> None:
     mock_creds.valid = True
 
     mocker.patch("quartoogle.google.Path.exists", return_value=True)
-    mock_from_file = mocker.patch("quartoogle.google.Credentials.from_authorized_user_file", return_value=mock_creds)
+    mock_from_file = mocker.patch(
+        "quartoogle.google.OAuth2Credentials.from_authorized_user_file", return_value=mock_creds
+    )
     mock_build = mocker.patch("quartoogle.google.build")
 
     services = Services(Path("/fake/credentials.json"))
