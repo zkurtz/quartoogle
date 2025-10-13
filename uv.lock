@@ -1883,6 +1883,7 @@ name = "quartoogle"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "attrs" },
     { name = "click" },
     { name = "google-api-python-client" },
     { name = "google-auth" },
@@ -1903,6 +1904,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "attrs", specifier = ">=24.0.0" },
     { name = "click", specifier = ">=8.0.0" },
     { name = "google-api-python-client", specifier = ">=2.0.0" },
     { name = "google-auth", specifier = ">=2.0.0" },

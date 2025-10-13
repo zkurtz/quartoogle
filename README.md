@@ -6,7 +6,6 @@ Compile your analytical reports directly to google docs, enabling your readers t
 
 ```bash
 quartoogle example.qmd --output "quartoogle-demo"
-```
 
 -----
 
