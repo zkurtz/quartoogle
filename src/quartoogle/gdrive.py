@@ -4,78 +4,10 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
 logger = logging.getLogger(__name__)
-
-# Scopes required for uploading files to Google Drive and modifying documents
-SCOPES = [
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/documents",
-]
-
-
-def authenticate(credentials_path: Path) -> Any:
-    """Authenticate with Google Drive API.
-
-    Args:
-        credentials_path: Path to the OAuth2 credentials JSON file
-
-    Returns:
-        Google Drive API service object
-
-    Raises:
-        RuntimeError: If authentication fails
-    """
-    creds = None
-    token_path = credentials_path.parent / "token.json"
-
-    # The token.json stores the user's access and refresh tokens
-    if token_path.exists():
-        logger.debug("Loading existing token")
-        creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
-
-    # If there are no (valid) credentials available, let the user log in
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            logger.debug("Refreshing expired token")
-            try:
-                creds.refresh(Request())
-            except Exception as err:
-                logger.warning(f"Token refresh failed: {err}. Re-authenticating...")
-                creds = None
-
-        if not creds:
-            if not credentials_path.exists():
-                raise RuntimeError(
-                    f"Credentials file not found: {credentials_path}\n"
-                    "Please download OAuth2 credentials from Google Cloud Console:\n"
-                    "1. Go to https://console.cloud.google.com/\n"
-                    "2. Create a project or select an existing one\n"
-                    "3. Enable the Google Drive API\n"
-                    "4. Create OAuth2 credentials (Desktop app)\n"
-                    "5. Download the credentials JSON file"
-                )
-
-            logger.info("Opening browser for authentication...")
-            flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), SCOPES)
-            creds = flow.run_local_server(port=0)
-
-        # Save the credentials for the next run
-        logger.debug("Saving token for future use")
-        token_path.write_text(creds.to_json())
-
-    try:
-        service = build("drive", "v3", credentials=creds)
-        logger.debug("Successfully authenticated with Google Drive")
-        return service
-    except Exception as e:
-        raise RuntimeError(f"Failed to build Google Drive service: {e}")
 
 
 def find_or_create_folder(service: Any, folder_name: str, parent_id: Optional[str] = None) -> str:
@@ -167,32 +99,28 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
         raise RuntimeError(f"Upload error: {e}")
 
 
-def set_pageless_format(service: Any, file_id: str) -> None:
+def set_pageless_format(docs_service: Any, file_id: str) -> None:
     """Set the document to pageless format.
 
     Args:
-        service: Google Drive API service object (with Docs API access)
+        docs_service: Google Docs API service object
         file_id: ID of the document to format
 
-    Raises:
-        RuntimeError: If formatting fails
+    Note:
+        Pageless format may not be available for all Google accounts or document types.
+        This function will attempt to set it and log a warning if it fails.
     """
     try:
-        # Build the Docs API service from the same credentials
-        # Get credentials from the Drive service
-        creds = service._http.credentials
-
-        # Build Docs API service
-        docs_service = build("docs", "v1", credentials=creds)
-
         logger.debug(f"Setting document {file_id} to pageless format...")
 
         # Get the current document to check if it exists
-        docs_service.documents().get(documentId=file_id).execute()
+        doc = docs_service.documents().get(documentId=file_id).execute()
+        logger.debug(f"Document retrieved: {doc.get('title', 'Unknown')}")
 
         # Update document style to use pageless format
-        # Pageless format in Google Docs is achieved by setting useCustomHeaderFooterMargins to False
-        # and not specifying page size, which allows content to flow continuously
+        # According to Google Docs API, pageless format is controlled by removing
+        # the pageSize field from documentStyle, which allows content to flow continuously
+        # We also set useCustomHeaderFooterMargins to False for consistency
         requests = [
             {
                 "updateDocumentStyle": {
@@ -208,10 +136,15 @@ def set_pageless_format(service: Any, file_id: str) -> None:
             }
         ]
 
-        docs_service.documents().batchUpdate(documentId=file_id, body={"requests": requests}).execute()
-
-        logger.debug("Successfully set document to pageless format")
+        result = docs_service.documents().batchUpdate(documentId=file_id, body={"requests": requests}).execute()
+        logger.debug(f"Pageless format update result: {result}")
+        logger.info("Successfully set document to pageless format")
 
     except Exception as e:
-        # Log warning but don't fail the upload
-        logger.warning(f"Failed to set pageless format (document still uploaded successfully): {e}")
+        # Log detailed error information for debugging
+        error_msg = str(e)
+        logger.warning(
+            f"Failed to set pageless format (document still uploaded successfully): {error_msg}\n"
+            "Note: Pageless format may not be available for all Google accounts or document types. "
+            "You can manually enable it in Google Docs via Format > Pageless."
+        )
