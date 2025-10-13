@@ -7,8 +7,7 @@ from pathlib import Path
 import click
 
 from quartoogle import constants
-from quartoogle.gdrive import get_drive_service, upload_file
-from quartoogle.quarto import compile_quarto
+from quartoogle.api import publish
 
 logger = logging.getLogger(__name__)
 
@@ -35,26 +34,14 @@ def main(source: Path, output: str, output_format: str, credentials: Path, verbo
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s: %(message)s")
 
     try:
-        # Validate source file extension
-        if not source.suffix == ".qmd":
-            logger.error(f"Source file must be a .qmd file, got: {source.suffix}")
-            sys.exit(1)
-
-        logger.info(f"Compiling {source} to {output_format}...")
-        output_path = compile_quarto(source, output_format)
-        logger.info(f"Successfully compiled to: {output_path}")
-
-        logger.info("Authenticating with Google Drive...")
-        drive_service = get_drive_service(credentials)
-
-        logger.info(f"Uploading to Google Drive directory: {output}")
-        file_id, file_url = upload_file(drive_service, output_path, output)
-
-        logger.info("Upload complete!")
-        logger.info(f"View your document at: {file_url}")
+        # Use the publish API function
+        publish(source, output, output_format, credentials)
 
     except KeyboardInterrupt:
         logger.info("\nOperation cancelled by user")
+        sys.exit(1)
+    except ValueError as e:
+        logger.error(f"Error: {e}")
         sys.exit(1)
     except Exception as e:
         logger.error(f"Error: {e}")
