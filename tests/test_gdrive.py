@@ -74,34 +74,6 @@ def test_find_or_create_folder_new(tmp_path: Path, mocker: MockerFixture) -> Non
     assert result == "newfolder123"
 
 
-def test_upload_file_with_folder_name(tmp_path: Path, mocker: MockerFixture) -> None:
-    """Test uploading file to a folder by name."""
-    test_file = tmp_path / "test.docx"
-    test_file.write_bytes(b"fake docx")
-
-    mock_service = mocker.Mock()
-    mock_files = mocker.Mock()
-
-    # Mock find_or_create_folder
-    mock_find = mocker.patch("quartoogle.gdrive.find_or_create_folder")
-    mock_find.return_value = "folder123"
-
-    # Mock file creation
-    mock_create = mocker.Mock()
-    mock_create.execute.return_value = {
-        "id": "file123",
-        "webViewLink": "https://docs.google.com/document/d/file123/edit",
-    }
-    mock_files.create.return_value = mock_create
-    mock_service.files.return_value = mock_files
-
-    file_id, file_url = upload_file(mock_service, test_file, "TestFolder")
-
-    assert file_id == "file123"
-    assert "docs.google.com" in file_url
-    assert "file123" in file_url
-
-
 def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test uploading file to a folder by ID."""
     test_file = tmp_path / "test.docx"
@@ -119,8 +91,8 @@ def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> No
     mock_files.create.return_value = mock_create
     mock_service.files.return_value = mock_files
 
-    # Use a long alphanumeric string as folder ID
-    file_id, file_url = upload_file(mock_service, test_file, "a1b2c3d4e5f6g7h8i9j0k1")
+    # Use a folder ID
+    file_id, file_url = upload_file(mock_service, test_file, "1a2b3c4d5e6f7g8h9i0j")
 
     assert file_id == "file123"
     assert "docs.google.com" in file_url
@@ -134,10 +106,6 @@ def test_upload_file_adds_timestamp_to_name(tmp_path: Path, mocker: MockerFixtur
     mock_service = mocker.Mock()
     mock_files = mocker.Mock()
 
-    # Mock find_or_create_folder
-    mock_find = mocker.patch("quartoogle.gdrive.find_or_create_folder")
-    mock_find.return_value = "folder123"
-
     # Mock file creation
     mock_create = mocker.Mock()
     mock_create.execute.return_value = {
@@ -147,8 +115,8 @@ def test_upload_file_adds_timestamp_to_name(tmp_path: Path, mocker: MockerFixtur
     mock_files.create.return_value = mock_create
     mock_service.files.return_value = mock_files
 
-    # Call upload_file
-    file_id, file_url = upload_file(mock_service, test_file, "TestFolder")
+    # Call upload_file with folder ID
+    file_id, file_url = upload_file(mock_service, test_file, "1a2b3c4d5e6f7g8h9i0j")
 
     # Verify the file was created with timestamp
     mock_files.create.assert_called_once()

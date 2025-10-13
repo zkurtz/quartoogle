@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def publish(
     source: str | Path,
-    output: str,
+    folder_id: str,
     output_format: str = "pdf",
     credentials: str | Path | None = None,
 ) -> tuple[str, str]:
@@ -23,7 +23,8 @@ def publish(
 
     Args:
         source: Path to the .qmd source file
-        output: Google Drive directory name or ID where the file will be uploaded
+        folder_id: Google Drive folder ID where the file will be uploaded.
+                   You must manually create the folder in Google Drive and obtain its ID from the URL.
         output_format: Output format (e.g., 'pdf', 'docx', 'html'). Default is 'pdf'.
         credentials: Path to Google OAuth2 credentials JSON file.
                     If not provided, uses the default location at ~/.config/google/drive/credentials.json
@@ -37,7 +38,7 @@ def publish(
 
     Example:
         >>> import quartoogle
-        >>> file_id, url = quartoogle.publish("report.qmd", output="Reports")
+        >>> file_id, url = quartoogle.publish("report.qmd", folder_id="1a2b3c4d5e6f7g8h9i0j")
         >>> print(f"Uploaded: {url}")
     """
     # Convert to Path objects
@@ -58,8 +59,8 @@ def publish(
     drive_service = get_drive_service(credentials_path)
 
     # Upload to Google Drive
-    logger.info(f"Uploading to Google Drive directory: {output}")
-    file_id, file_url = upload_file(drive_service, output_path, output)
+    logger.info(f"Uploading to Google Drive folder: {folder_id}")
+    file_id, file_url = upload_file(drive_service, output_path, folder_id)
 
     logger.info("Upload complete!")
     logger.info(f"View your document at: {file_url}")

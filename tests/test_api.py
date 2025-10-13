@@ -11,7 +11,7 @@ from quartoogle.api import publish
 def test_publish_invalid_file_extension() -> None:
     """Test that publish raises ValueError for non-.qmd files."""
     with pytest.raises(ValueError) as exc_info:
-        publish("test.txt", output="TestFolder")
+        publish("test.txt", folder_id="1a2b3c4d5e6f7g8h9i0j")
 
     assert ".qmd" in str(exc_info.value)
     assert "test.txt" in str(exc_info.value)
@@ -39,7 +39,7 @@ def test_publish_success(tmp_path: Path, mocker: MockerFixture) -> None:
     mock_upload.return_value = ("file123", "https://docs.google.com/document/d/file123/edit")
 
     # Call publish
-    file_id, file_url = publish(source, output="TestFolder")
+    file_id, file_url = publish(source, folder_id="1a2b3c4d5e6f7g8h9i0j")
 
     # Verify the results
     assert file_id == "file123"
@@ -48,7 +48,7 @@ def test_publish_success(tmp_path: Path, mocker: MockerFixture) -> None:
     # Verify the mocks were called correctly
     mock_compile.assert_called_once_with(source, "pdf")
     mock_get_service.assert_called_once()
-    mock_upload.assert_called_once_with(mock_service, pdf, "TestFolder")
+    mock_upload.assert_called_once_with(mock_service, pdf, "1a2b3c4d5e6f7g8h9i0j")
 
 
 def test_publish_with_custom_format(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -73,7 +73,7 @@ def test_publish_with_custom_format(tmp_path: Path, mocker: MockerFixture) -> No
     mock_upload.return_value = ("file123", "https://docs.google.com/document/d/file123/edit")
 
     # Call publish with docx format
-    file_id, file_url = publish(source, output="TestFolder", output_format="docx")
+    file_id, file_url = publish(source, folder_id="1a2b3c4d5e6f7g8h9i0j", output_format="docx")
 
     # Verify compile_quarto was called with docx format
     mock_compile.assert_called_once_with(source, "docx")
@@ -104,7 +104,7 @@ def test_publish_with_custom_credentials(tmp_path: Path, mocker: MockerFixture) 
     mock_upload.return_value = ("file123", "https://docs.google.com/document/d/file123/edit")
 
     # Call publish with custom credentials
-    publish(source, output="TestFolder", credentials=creds)
+    publish(source, folder_id="1a2b3c4d5e6f7g8h9i0j", credentials=creds)
 
     # Verify get_drive_service was called with custom credentials path
     mock_get_service.assert_called_once_with(creds)
@@ -132,7 +132,7 @@ def test_publish_with_string_paths(tmp_path: Path, mocker: MockerFixture) -> Non
     mock_upload.return_value = ("file123", "https://docs.google.com/document/d/file123/edit")
 
     # Call publish with string path
-    file_id, file_url = publish(str(source), output="TestFolder")
+    file_id, file_url = publish(str(source), folder_id="1a2b3c4d5e6f7g8h9i0j")
 
     # Verify it worked
     assert file_id == "file123"

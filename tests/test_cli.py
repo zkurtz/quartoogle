@@ -20,14 +20,14 @@ def test_cli_help() -> None:
 def test_cli_missing_source() -> None:
     """Test that CLI fails when source file is missing."""
     runner = CliRunner()
-    result = runner.invoke(main, ["nonexistent.qmd", "--output", "test"])
+    result = runner.invoke(main, ["nonexistent.qmd", "--folder-id", "1a2b3c4d5e6f7g8h9i0j"])
 
     # Should exit with error code
     assert result.exit_code != 0
 
 
 def test_cli_missing_output_arg() -> None:
-    """Test that CLI fails when --output is not provided."""
+    """Test that CLI fails when --folder-id is not provided."""
     runner = CliRunner()
     result = runner.invoke(main, ["test.qmd"])
 
@@ -42,7 +42,7 @@ def test_cli_with_to_option(tmp_path: Path) -> None:
     test_file.write_text("# Test")
 
     runner = CliRunner()
-    result = runner.invoke(main, [str(test_file), "--output", "test", "--to", "html"])
+    result = runner.invoke(main, [str(test_file), "--folder-id", "1a2b3c4d5e6f7g8h9i0j", "--to", "html"])
 
     # Should fail (no real quarto/google creds) but should accept the --to option
     # The error should not be about the --to option
@@ -56,6 +56,6 @@ def test_cli_invalid_file_extension(tmp_path: Path) -> None:
     test_file.write_text("test")
 
     runner = CliRunner()
-    result = runner.invoke(main, [str(test_file), "--output", "test"])
+    result = runner.invoke(main, [str(test_file), "--folder-id", "1a2b3c4d5e6f7g8h9i0j"])
 
     assert result.exit_code == 1
