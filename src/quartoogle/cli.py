@@ -39,13 +39,13 @@ def main(source: Path, output: str, credentials: Path, verbose: bool) -> None:
         logger.info(f"Successfully compiled to: {docx_path}")
 
         logger.info("Authenticating with Google Drive...")
-        service = authenticate(credentials)
+        drive_service, docs_service = authenticate(credentials)
 
         logger.info(f"Uploading to Google Drive directory: {output}")
-        file_id, file_url = upload_file(service, docx_path, output)
+        file_id, file_url = upload_file(drive_service, docx_path, output)
 
         logger.info("Setting document to pageless format...")
-        set_pageless_format(service, file_id)
+        set_pageless_format(docs_service, file_id)
 
         logger.info("Upload complete!")
         logger.info(f"View your document at: {file_url}")

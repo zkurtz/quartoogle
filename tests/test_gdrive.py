@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from quartoogle.gdrive import authenticate, find_or_create_folder, upload_file
+from quartoogle.gdrive import authenticate, find_or_create_folder, set_pageless_format, upload_file
 
 
 def test_authenticate_missing_credentials(mocker: MockerFixture) -> None:
@@ -107,3 +107,44 @@ def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> No
 
     assert file_id == "file123"
     assert "docs.google.com" in file_url
+
+
+def test_set_pageless_format_success(mocker: MockerFixture) -> None:
+    """Test setting document to pageless format."""
+    mock_docs_service = mocker.Mock()
+    mock_documents = mocker.Mock()
+    mock_get = mocker.Mock()
+    mock_batch_update = mocker.Mock()
+
+    # Mock document.get() to verify document exists
+    mock_get.execute.return_value = {"documentId": "doc123"}
+    mock_documents.get.return_value = mock_get
+
+    # Mock batchUpdate to succeed
+    mock_batch_update.execute.return_value = {}
+    mock_documents.batchUpdate.return_value = mock_batch_update
+
+    mock_docs_service.documents.return_value = mock_documents
+
+    # Should not raise an exception
+    set_pageless_format(mock_docs_service, "doc123")
+
+    # Verify the calls were made
+    mock_documents.get.assert_called_once_with(documentId="doc123")
+    mock_documents.batchUpdate.assert_called_once()
+
+
+def test_set_pageless_format_handles_error(mocker: MockerFixture, caplog: pytest.LogCaptureFixture) -> None:
+    """Test that set_pageless_format handles errors gracefully."""
+    mock_docs_service = mocker.Mock()
+    mock_documents = mocker.Mock()
+
+    # Mock document.get() to raise an error
+    mock_documents.get.side_effect = Exception("Document not found")
+    mock_docs_service.documents.return_value = mock_documents
+
+    # Should not raise an exception (error is logged as warning)
+    set_pageless_format(mock_docs_service, "doc123")
+
+    # Verify warning was logged
+    assert any("Failed to set pageless format" in record.message for record in caplog.records)

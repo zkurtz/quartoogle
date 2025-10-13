@@ -20,14 +20,14 @@ SCOPES = [
 ]
 
 
-def authenticate(credentials_path: Path) -> Any:
-    """Authenticate with Google Drive API.
+def authenticate(credentials_path: Path) -> tuple[Any, Any]:
+    """Authenticate with Google Drive and Docs APIs.
 
     Args:
         credentials_path: Path to the OAuth2 credentials JSON file
 
     Returns:
-        Google Drive API service object
+        Tuple of (Drive API service object, Docs API service object)
 
     Raises:
         RuntimeError: If authentication fails
@@ -71,11 +71,13 @@ def authenticate(credentials_path: Path) -> Any:
         token_path.write_text(creds.to_json())
 
     try:
-        service = build("drive", "v3", credentials=creds)
+        drive_service = build("drive", "v3", credentials=creds)
         logger.debug("Successfully authenticated with Google Drive")
-        return service
+        docs_service = build("docs", "v1", credentials=creds)
+        logger.debug("Successfully authenticated with Google Docs")
+        return drive_service, docs_service
     except Exception as e:
-        raise RuntimeError(f"Failed to build Google Drive service: {e}")
+        raise RuntimeError(f"Failed to build Google API services: {e}")
 
 
 def find_or_create_folder(service: Any, folder_name: str, parent_id: Optional[str] = None) -> str:
@@ -167,24 +169,17 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
         raise RuntimeError(f"Upload error: {e}")
 
 
-def set_pageless_format(service: Any, file_id: str) -> None:
+def set_pageless_format(docs_service: Any, file_id: str) -> None:
     """Set the document to pageless format.
 
     Args:
-        service: Google Drive API service object (with Docs API access)
+        docs_service: Google Docs API service object
         file_id: ID of the document to format
 
     Raises:
         RuntimeError: If formatting fails
     """
     try:
-        # Build the Docs API service from the same credentials
-        # Get credentials from the Drive service
-        creds = service._http.credentials
-
-        # Build Docs API service
-        docs_service = build("docs", "v1", credentials=creds)
-
         logger.debug(f"Setting document {file_id} to pageless format...")
 
         # Get the current document to check if it exists
