@@ -96,7 +96,7 @@ def upload_file(service: Any, file_path: Path, destination: str) -> tuple[str, s
             resumable=True,
         )
 
-        logger.debug(f"Uploading {file_path.name}...")
+        logger.debug(f"Uploading {file_path.name} as {timestamped_name}...")
         file = service.files().create(body=file_metadata, media_body=media, fields="id, webViewLink").execute()
 
         file_id = file.get("id")
