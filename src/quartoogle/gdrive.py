@@ -96,13 +96,17 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
         if parent_id:
             query += f" and '{parent_id}' in parents"
 
-        results = service.files().list(
-            q=query, 
-            spaces="drive", 
-            fields="files(id, name)",
-            supportsAllDrives=True,  # ADD THIS
-            includeItemsFromAllDrives=True  # ADD THIS
-        ).execute()
+        results = (
+            service.files()
+            .list(
+                q=query,
+                spaces="drive",
+                fields="files(id, name)",
+                supportsAllDrives=True,  # ADD THIS
+                includeItemsFromAllDrives=True,  # ADD THIS
+            )
+            .execute()
+        )
 
         items = results.get("files", [])
 
@@ -116,18 +120,22 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
         if parent_id:
             file_metadata["parents"] = [parent_id]
 
-        folder = service.files().create(
-            body=file_metadata, 
-            fields="id",
-            supportsAllDrives=True  # ADD THIS
-        ).execute()
+        folder = (
+            service.files()
+            .create(
+                body=file_metadata,
+                fields="id",
+                supportsAllDrives=True,  # ADD THIS
+            )
+            .execute()
+        )
 
         logger.debug(f"Created folder with ID: {folder['id']}")
         return folder["id"]
 
     except HttpError as e:
         raise RuntimeError(f"Failed to find or create folder: {e}")
-    
+
 
 def upload_file(service: Any, file_path: Path, folder_id: str) -> tuple[str, str]:
     """Upload a file to Google Drive with a timestamp suffix.
@@ -178,12 +186,16 @@ def upload_file(service: Any, file_path: Path, folder_id: str) -> tuple[str, str
         )
 
         logger.debug(f"Uploading {file_path.name} as {timestamped_name}...")
-        file = service.files().create(
-            body=file_metadata, 
-            media_body=media, 
-            fields="id, webViewLink",
-            supportsAllDrives=True  # ADD THIS
-        ).execute()
+        file = (
+            service.files()
+            .create(
+                body=file_metadata,
+                media_body=media,
+                fields="id, webViewLink",
+                supportsAllDrives=True,  # ADD THIS
+            )
+            .execute()
+        )
 
         file_id = file.get("id")
         web_view_link = file.get("webViewLink")
