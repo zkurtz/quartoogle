@@ -20,6 +20,7 @@ INFO: View your document at: https://docs.google.com/document/d/DOCUMENT_ID/edit
 How it works:
 - Renders `.qmd` files to MS Word format
 - Uploads directly to the specified folder in your Google Drive, creating the folder if it does not exist
+- Automatically adds a timestamp to uploaded filenames (format: `[basename]_YYYY-MM-DD_HH-MM[extension]`) to help distinguish between multiple versions
 - Uses OAuth2 authentication (Secure authentication with token caching)
 
 

@@ -124,3 +124,44 @@ def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> No
 
     assert file_id == "file123"
     assert "docs.google.com" in file_url
+
+
+def test_upload_file_adds_timestamp_to_name(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test that uploaded file name includes timestamp suffix."""
+    test_file = tmp_path / "report.docx"
+    test_file.write_bytes(b"fake docx")
+
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
+
+    # Mock find_or_create_folder
+    mock_find = mocker.patch("quartoogle.gdrive.find_or_create_folder")
+    mock_find.return_value = "folder123"
+
+    # Mock file creation
+    mock_create = mocker.Mock()
+    mock_create.execute.return_value = {
+        "id": "file123",
+        "webViewLink": "https://docs.google.com/document/d/file123/edit",
+    }
+    mock_files.create.return_value = mock_create
+    mock_service.files.return_value = mock_files
+
+    # Call upload_file
+    file_id, file_url = upload_file(mock_service, test_file, "TestFolder")
+
+    # Verify the file was created with timestamp
+    mock_files.create.assert_called_once()
+    call_args = mock_files.create.call_args
+    file_metadata = call_args.kwargs["body"]
+
+    # Check that the name has timestamp format: report_YYYY-MM-DD_HH-MM.docx
+    import re
+
+    pattern = r"^report_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.docx$"
+    assert re.match(pattern, file_metadata["name"]), f"Expected timestamp format, got: {file_metadata['name']}"
+
+    # Verify the name starts with the original stem
+    assert file_metadata["name"].startswith("report_")
+    # Verify it ends with the correct extension
+    assert file_metadata["name"].endswith(".docx")
