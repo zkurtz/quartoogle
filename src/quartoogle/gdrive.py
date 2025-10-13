@@ -3,7 +3,7 @@
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from google.auth.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -79,13 +79,13 @@ def get_drive_service(credentials_path: Path) -> Any:
         raise RuntimeError(f"Failed to build Google Drive service: {e}")
 
 
-def find_or_create_folder(service: Any, folder_name: str, parent_id: Optional[str] = None) -> str:
+def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None = None) -> str:
     """Find a folder by name or create it if it doesn't exist.
 
     Args:
         service: Google Drive API service object
         folder_name: Name of the folder to find or create
-        parent_id: Optional parent folder ID
+        parent_id: Optional parent folder ID (None if root level)
 
     Returns:
         Folder ID

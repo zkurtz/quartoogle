@@ -2,7 +2,6 @@
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 from quartoogle import constants
 from quartoogle.gdrive import get_drive_service, upload_file
@@ -15,7 +14,7 @@ def publish(
     source: str | Path,
     output: str,
     output_format: str = "pdf",
-    credentials: Optional[str | Path] = None,
+    credentials: str | Path | None = None,
 ) -> tuple[str, str]:
     """Compile a quarto document and upload it to Google Drive.
 
