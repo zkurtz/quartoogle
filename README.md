@@ -2,7 +2,7 @@
 
 *Pronounced "kor-TOO-gul"*
 
-Compile your analytical reports directly to google docs, enabling your readers to comment directly on your work. Powered by [quarto](https://quarto.org/) and the [Google Drive API](https://developers.google.com/drive). 
+Compile your analytical reports directly to google drive. Powered by [quarto](https://quarto.org/) and the [Google Drive API](https://developers.google.com/drive).
 
 Use it from the command line:
 
@@ -49,65 +49,17 @@ How it works:
 
 ## Usage Examples
 
-### Command Line Interface
-
-Basic usage (PDF output by default):
+Basic command-line usage (PDF output by default):
 ```bash
 quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j"
 ```
 
-Compile to MS Word format:
+Compile to MS Word format, or any other quarto-supported format:
 ```bash
 quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" --to docx
-```
-
-Compile to HTML format:
-```bash
-quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" --to html
-```
-
-Verbose mode:
-```bash
-quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" -v
 ```
 
 Custom credentials file:
 ```bash
 quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" --credentials path/to/credentials.json
 ```
-
-### Python API
-
-Quartoogle can also be used programmatically from within your Python code:
-
-```python
-import quartoogle
-
-# Basic usage - compile and upload to Google Drive
-file_id, url = quartoogle.publish("report.qmd", folder_id="1a2b3c4d5e6f7g8h9i0j")
-print(f"Uploaded to: {url}")
-
-# Compile to a different format (docx, html, etc.)
-file_id, url = quartoogle.publish(
-    "report.qmd", 
-    folder_id="1a2b3c4d5e6f7g8h9i0j",
-    output_format="docx"
-)
-
-# Use custom credentials
-file_id, url = quartoogle.publish(
-    "report.qmd",
-    folder_id="1a2b3c4d5e6f7g8h9i0j",
-    credentials="/path/to/credentials.json"
-)
-```
-
-The `publish()` function accepts the following parameters:
-- `source` (str | Path): Path to the .qmd source file
-- `folder_id` (str): Google Drive folder ID where the file will be uploaded. You must manually create the folder in Google Drive and obtain its ID from the URL (the folder ID is the long alphanumeric string after `/folders/` in the URL).
-- `output_format` (str, optional): Output format (e.g., 'pdf', 'docx', 'html'). Default is 'pdf'
-- `credentials` (str | Path, optional): Path to Google OAuth2 credentials JSON file. If not provided, uses the default location at `~/.config/google/drive/credentials.json`
-
-Returns a tuple of `(file_id, web_view_link)` for the uploaded file.
-
-
