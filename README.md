@@ -63,3 +63,15 @@ Custom credentials file:
 ```bash
 quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" --credentials path/to/credentials.json
 ```
+
+## Best practices
+
+Output format:
+
+- PDF is the best choice for most users who need user to be able to comment on the doc in google drive.
+- HTML may be superior if view-ability (without commenting) is the main goal.
+- Quarto also support MS Word format, but tends to have severe formatting issues even for moderately complex documents.
+
+Development workflow: Do not call quartoogle for every dev iteration on your document. Instead, use tools like
+- VSCode extension: Quarto -- enables live execution and preview of .qmd files.
+- VSCode extension: vscode-pdf -- enables live preview of .pdf files.

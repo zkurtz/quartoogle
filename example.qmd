@@ -2,6 +2,7 @@
 title: "Quartoogle Demo Report"
 author: "Quartoogle"
 date: today
+format: pdf
 execute:
   echo: false
   warning: false
@@ -31,13 +32,13 @@ Here is another dynamically-generated value showing the average compile time: **
 
 ## Usage Statistics
 
-The table below shows key metrics about quartoogle usage rendered from a pandas DataFrame:
+The table below shows fake metrics rendered from a pandas DataFrame:
 
 ```{python}
-from tabulate import tabulate
+#| label: tbl-example
+#| tbl-cap: "Your table caption here"
 
-# Create a pandas DataFrame with usage statistics
-usage_stats = pd.DataFrame({
+df = pd.DataFrame({
     'Metric': [
         'Total Reports Compiled',
         'Reports This Month',
@@ -50,7 +51,8 @@ usage_stats = pd.DataFrame({
     ]
 })
 
-print(tabulate(usage_stats, headers="keys", tablefmt="github"))
+from great_tables import GT
+GT(df)
 ```
 
 ## Compilation Times
@@ -74,5 +76,3 @@ ax.set_ylim(0, max(compile_times) * 1.2)
 plt.tight_layout()
 plt.show()
 ```
-
-As shown in the chart above, quartoogle maintains consistent compilation times, with most reports compiling in under 3 seconds.
