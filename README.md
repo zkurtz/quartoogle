@@ -64,6 +64,11 @@ Custom credentials file:
 quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" --credentials path/to/credentials.json
 ```
 
+Enable verbose logging (shows all debug messages and quarto output):
+```bash
+quartoogle report.qmd --folder-id "1a2b3c4d5e6f7g8h9i0j" -v
+```
+
 ## Best practices
 
 Output format:

@@ -58,7 +58,7 @@ def test_compile_to_docx_success(tmp_path: Path, mocker: MockerFixture) -> None:
     assert result == pdf
     assert result.exists()
     # Verify render was called with correct arguments (default is pdf)
-    mock_render.assert_called_once_with(str(source), output_format="pdf")
+    mock_render.assert_called_once_with(str(source), output_format="pdf", quiet=True)
 
 
 def test_compile_quarto_with_docx(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -77,7 +77,7 @@ def test_compile_quarto_with_docx(tmp_path: Path, mocker: MockerFixture) -> None
     assert result == docx
     assert result.exists()
     # Verify render was called with correct arguments
-    mock_render.assert_called_once_with(str(source), output_format="docx")
+    mock_render.assert_called_once_with(str(source), output_format="docx", quiet=True)
 
 
 def test_compile_to_docx_backward_compatibility(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -96,4 +96,4 @@ def test_compile_to_docx_backward_compatibility(tmp_path: Path, mocker: MockerFi
     assert result == docx
     assert result.exists()
     # Verify render was called with docx format
-    mock_render.assert_called_once_with(str(source), output_format="docx")
+    mock_render.assert_called_once_with(str(source), output_format="docx", quiet=True)
