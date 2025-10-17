@@ -11,6 +11,8 @@ from quartoogle.api import publish
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_THIRD_PARTY_LOGGING_LEVEL = logging.WARNING
+
 
 @click.command()
 @click.argument("source", type=click.Path(exists=True, path_type=Path))
@@ -37,10 +39,10 @@ def main(source: Path, folder_id: str, output_format: str, credentials: Path, ve
     else:
         # In normal mode, show only INFO and higher for quartoogle modules
         logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-        # Suppress warnings and lower from third-party libraries
-        logging.getLogger("googleapiclient").setLevel(logging.ERROR)
-        logging.getLogger("google").setLevel(logging.ERROR)
-        logging.getLogger("urllib3").setLevel(logging.ERROR)
+        # Set third-party libraries to warning level to reduce noise
+        logging.getLogger("googleapiclient").setLevel(DEFAULT_THIRD_PARTY_LOGGING_LEVEL)
+        logging.getLogger("google").setLevel(DEFAULT_THIRD_PARTY_LOGGING_LEVEL)
+        logging.getLogger("urllib3").setLevel(DEFAULT_THIRD_PARTY_LOGGING_LEVEL)
 
     try:
         # Use the publish API function
