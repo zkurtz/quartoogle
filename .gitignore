@@ -210,5 +210,10 @@ __marimo__/
 token.json
 credentials.json
 
+
+example_files/*
 *.docx
 *.pdf
+*.code-workspace
+*dev.py
+*.html
