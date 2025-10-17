@@ -22,7 +22,10 @@ def compile_quarto(source_path: Path, output_format: str = "pdf") -> Path:
         RuntimeError: If quarto is not installed or compilation fails
     """
     logger.debug(f"Rendering {source_path} to {output_format}")
-    render(str(source_path), output_format=output_format)
+    
+    # Use quiet mode unless logging level is DEBUG
+    quiet = logger.getEffectiveLevel() > logging.DEBUG
+    render(str(source_path), output_format=output_format, quiet=quiet)
 
     # Determine output path (quarto creates output file next to source)
     output_path = source_path.with_suffix(f".{output_format}")

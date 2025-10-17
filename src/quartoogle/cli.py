@@ -31,7 +31,16 @@ logger = logging.getLogger(__name__)
 def main(source: Path, folder_id: str, output_format: str, credentials: Path, verbose: bool) -> None:
     """Compile quarto docs directly to Google Drive."""
     # Setup logging based on verbose flag
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s: %(message)s")
+    if verbose:
+        # In verbose mode, show everything at DEBUG level
+        logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+    else:
+        # In normal mode, show only INFO and higher for quartoogle modules
+        logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+        # Suppress warnings and lower from third-party libraries
+        logging.getLogger("googleapiclient").setLevel(logging.ERROR)
+        logging.getLogger("google").setLevel(logging.ERROR)
+        logging.getLogger("urllib3").setLevel(logging.ERROR)
 
     try:
         # Use the publish API function
