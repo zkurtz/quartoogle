@@ -32,7 +32,7 @@ def test_publish_success(tmp_path: Path, mocker: MockerFixture) -> None:
     mock_compile.return_value = pdf
 
     mock_get_service = mocker.patch("quartoogle.api.get_drive_service")
-    mock_service = mocker.Mock()
+    mock_service = mocker.MagicMock()
     mock_get_service.return_value = mock_service
 
     mock_upload = mocker.patch("quartoogle.api.upload_file")
@@ -48,7 +48,9 @@ def test_publish_success(tmp_path: Path, mocker: MockerFixture) -> None:
     # Verify the mocks were called correctly
     mock_compile.assert_called_once_with(source, "pdf")
     mock_get_service.assert_called_once()
-    mock_upload.assert_called_once_with(mock_service, pdf, "1a2b3c4d5e6f7g8h9i0j")
+    # Context manager returns the mock itself via __enter__
+    mock_upload.assert_called_once_with(mock_service.__enter__(), pdf, "1a2b3c4d5e6f7g8h9i0j")
+    mock_service.__exit__.assert_called_once()
 
 
 def test_publish_with_custom_format(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -66,7 +68,7 @@ def test_publish_with_custom_format(tmp_path: Path, mocker: MockerFixture) -> No
     mock_compile.return_value = docx
 
     mock_get_service = mocker.patch("quartoogle.api.get_drive_service")
-    mock_service = mocker.Mock()
+    mock_service = mocker.MagicMock()
     mock_get_service.return_value = mock_service
 
     mock_upload = mocker.patch("quartoogle.api.upload_file")
@@ -77,6 +79,8 @@ def test_publish_with_custom_format(tmp_path: Path, mocker: MockerFixture) -> No
 
     # Verify compile_quarto was called with docx format
     mock_compile.assert_called_once_with(source, "docx")
+    # Verify context manager was used (service closed automatically)
+    mock_service.__exit__.assert_called_once()
 
 
 def test_publish_with_custom_credentials(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -97,7 +101,7 @@ def test_publish_with_custom_credentials(tmp_path: Path, mocker: MockerFixture) 
     mock_compile.return_value = pdf
 
     mock_get_service = mocker.patch("quartoogle.api.get_drive_service")
-    mock_service = mocker.Mock()
+    mock_service = mocker.MagicMock()
     mock_get_service.return_value = mock_service
 
     mock_upload = mocker.patch("quartoogle.api.upload_file")
@@ -108,6 +112,8 @@ def test_publish_with_custom_credentials(tmp_path: Path, mocker: MockerFixture) 
 
     # Verify get_drive_service was called with custom credentials path
     mock_get_service.assert_called_once_with(creds)
+    # Verify context manager was used (service closed automatically)
+    mock_service.__exit__.assert_called_once()
 
 
 def test_publish_with_string_paths(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -125,7 +131,7 @@ def test_publish_with_string_paths(tmp_path: Path, mocker: MockerFixture) -> Non
     mock_compile.return_value = pdf
 
     mock_get_service = mocker.patch("quartoogle.api.get_drive_service")
-    mock_service = mocker.Mock()
+    mock_service = mocker.MagicMock()
     mock_get_service.return_value = mock_service
 
     mock_upload = mocker.patch("quartoogle.api.upload_file")
@@ -137,3 +143,5 @@ def test_publish_with_string_paths(tmp_path: Path, mocker: MockerFixture) -> Non
     # Verify it worked
     assert file_id == "file123"
     assert "file123" in file_url
+    # Verify context manager was used (service closed automatically)
+    mock_service.__exit__.assert_called_once()
