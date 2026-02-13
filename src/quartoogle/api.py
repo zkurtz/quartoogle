@@ -54,15 +54,13 @@ def publish(
     output_path = compile_quarto(source_path, output_format)
     logger.info(f"Successfully compiled to: {output_path}")
 
-    # Authenticate with Google Drive
+    # Authenticate with Google Drive and upload
     logger.info("Authenticating with Google Drive...")
-    drive_service = get_drive_service(credentials_path)
+    with get_drive_service(credentials_path) as drive_service:
+        logger.info(f"Uploading to Google Drive folder: {folder_id}")
+        file_id, file_url = upload_file(drive_service, output_path, folder_id)
 
-    # Upload to Google Drive
-    logger.info(f"Uploading to Google Drive folder: {folder_id}")
-    file_id, file_url = upload_file(drive_service, output_path, folder_id)
-
-    logger.info("Upload complete!")
-    logger.info(f"View your document at: {file_url}")
+        logger.info("Upload complete!")
+        logger.info(f"View your document at: {file_url}")
 
     return file_id, file_url
