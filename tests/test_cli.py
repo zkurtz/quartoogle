@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from click.testing import CliRunner
+from pytest_mock import MockerFixture
 
 from quartoogle.cli import main
 
@@ -35,18 +36,24 @@ def test_cli_missing_output_arg() -> None:
     assert result.exit_code == 2
 
 
-def test_cli_with_to_option(tmp_path: Path) -> None:
+def test_cli_with_to_option(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test that CLI accepts --to option for format."""
     # Create a .qmd file
     test_file = tmp_path / "test.qmd"
     test_file.write_text("# Test")
 
+    # Mock publish to avoid real quarto/Google calls
+    mock_publish = mocker.patch("quartoogle.cli.publish")
+    mock_publish.return_value = ("file123", "https://example.com/file123")
+
     runner = CliRunner()
     result = runner.invoke(main, [str(test_file), "--folder-id", "1a2b3c4d5e6f7g8h9i0j", "--to", "html"])
 
-    # Should fail (no real quarto/google creds) but should accept the --to option
-    # The error should not be about the --to option
-    assert "--to" not in result.output or result.exit_code != 2
+    assert result.exit_code == 0
+    # Verify publish was called with the html format
+    mock_publish.assert_called_once()
+    call_args = mock_publish.call_args
+    assert call_args[0][2] == "html"  # output_format argument
 
 
 def test_cli_invalid_file_extension(tmp_path: Path) -> None:

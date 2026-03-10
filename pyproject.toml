@@ -26,7 +26,7 @@ dev = [
     "great-tables>=0.19.0",
     "matplotlib>=3.10.7",
     "pandas>=2.3.3",
-    "pyright>=1.1.406",
+    "ty>=0.0.1a7",
     "pytest>=8.4.2",
     "pytest-mock>=3.14.0",
     "ruff>=0.14.0",
@@ -42,7 +42,7 @@ packages = ["src/quartoogle",]
 [tool.pytest.ini_options]
 testpaths = ["tests",]
 
-[tool.pyright]
+[tool.ty.src]
 include = ["src", "tests"]
 
 [tool.ruff]
@@ -58,7 +58,7 @@ select = [
   "I", # flake8-import-order
   "TID", # flake8-tidy-imports
   "D", # google-style docstrings,
-  "ANN", # require pyright type annotations
+  "ANN", # require type annotations
 ]
 ignore = [
   "ANN002", # Missing type annotation for *args
