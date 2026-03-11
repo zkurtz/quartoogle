@@ -42,16 +42,65 @@ def test_compile_to_docx_output_not_found(mocker: MockerFixture) -> None:
     assert "not found" in str(exc_info.value).lower()
 
 
+def test_stale_output_file_deleted_before_compilation(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test that stale output files are deleted before compilation.
+
+    This prevents uploading an old report if the current compilation fails.
+    Reproduces GitHub issue #42.
+    """
+    source = tmp_path / "test.qmd"
+    source.write_text("# Test")
+    pdf = tmp_path / "test.pdf"
+    # Create an old/stale PDF file
+    pdf.write_bytes(b"stale pdf content")
+    assert pdf.exists()
+
+    mock_render = mocker.patch("quartoogle.quarto.render")
+    # Simulate render failing silently (doesn't raise, but doesn't create file)
+    mock_render.return_value = None
+
+    with pytest.raises(RuntimeError) as exc_info:
+        compile_quarto(source)
+
+    # The error should indicate no output file, not return the stale file
+    assert "not found" in str(exc_info.value).lower()
+    # The stale file should have been deleted
+    assert not pdf.exists()
+
+
+def test_stale_output_file_replaced_on_success(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test that stale output files are replaced when compilation succeeds."""
+    source = tmp_path / "test.qmd"
+    source.write_text("# Test")
+    pdf = tmp_path / "test.pdf"
+    # Create an old/stale PDF file
+    pdf.write_bytes(b"stale pdf content")
+
+    def mock_render_side_effect(*args, **kwargs) -> None:
+        # Simulate successful render by creating new file content
+        pdf.write_bytes(b"new pdf content")
+
+    mock_render = mocker.patch("quartoogle.quarto.render")
+    mock_render.side_effect = mock_render_side_effect
+
+    result = compile_quarto(source)
+
+    assert result == pdf
+    assert result.exists()
+    assert result.read_bytes() == b"new pdf content"
+
+
 def test_compile_to_docx_success(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test successful compilation to PDF (default)."""
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
     pdf = tmp_path / "test.pdf"
-    pdf.write_bytes(b"fake pdf")
+
+    def mock_render_side_effect(*args, **kwargs) -> None:
+        pdf.write_bytes(b"fake pdf")
 
     mock_render = mocker.patch("quartoogle.quarto.render")
-    # Mock successful render
-    mock_render.return_value = None
+    mock_render.side_effect = mock_render_side_effect
 
     result = compile_quarto(source)
 
@@ -66,11 +115,12 @@ def test_compile_quarto_with_docx(tmp_path: Path, mocker: MockerFixture) -> None
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
     docx = tmp_path / "test.docx"
-    docx.write_bytes(b"fake docx")
+
+    def mock_render_side_effect(*args, **kwargs) -> None:
+        docx.write_bytes(b"fake docx")
 
     mock_render = mocker.patch("quartoogle.quarto.render")
-    # Mock successful render
-    mock_render.return_value = None
+    mock_render.side_effect = mock_render_side_effect
 
     result = compile_quarto(source, "docx")
 
@@ -85,11 +135,12 @@ def test_compile_to_docx_backward_compatibility(tmp_path: Path, mocker: MockerFi
     source = tmp_path / "test.qmd"
     source.write_text("# Test")
     docx = tmp_path / "test.docx"
-    docx.write_bytes(b"fake docx")
+
+    def mock_render_side_effect(*args, **kwargs) -> None:
+        docx.write_bytes(b"fake docx")
 
     mock_render = mocker.patch("quartoogle.quarto.render")
-    # Mock successful render
-    mock_render.return_value = None
+    mock_render.side_effect = mock_render_side_effect
 
     result = compile_to_docx(source)
 
