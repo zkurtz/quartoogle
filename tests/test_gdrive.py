@@ -52,6 +52,23 @@ def test_find_or_create_folder_existing(tmp_path: Path, mocker: MockerFixture) -
     assert result == "folder123"
 
 
+def test_find_or_create_folder_passes_list_params(mocker: MockerFixture) -> None:
+    """Test that listing folders passes supportsAllDrives and includeItemsFromAllDrives."""
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
+    mock_list = mocker.Mock()
+
+    mock_list.execute.return_value = {"files": [{"id": "folder123", "name": "TestFolder"}]}
+    mock_files.list.return_value = mock_list
+    mock_service.files.return_value = mock_files
+
+    find_or_create_folder(mock_service, "TestFolder")
+
+    call_kwargs = mock_files.list.call_args.kwargs
+    assert call_kwargs.get("supportsAllDrives") is True
+    assert call_kwargs.get("includeItemsFromAllDrives") is True
+
+
 def test_find_or_create_folder_new(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test creating a new folder."""
     mock_service = mocker.Mock()
@@ -72,6 +89,25 @@ def test_find_or_create_folder_new(tmp_path: Path, mocker: MockerFixture) -> Non
     result = find_or_create_folder(mock_service, "NewFolder")
 
     assert result == "newfolder123"
+
+
+def test_find_or_create_folder_passes_create_params(mocker: MockerFixture) -> None:
+    """Test that creating a folder passes supportsAllDrives."""
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
+    mock_list = mocker.Mock()
+    mock_create = mocker.Mock()
+
+    mock_list.execute.return_value = {"files": []}
+    mock_files.list.return_value = mock_list
+    mock_create.execute.return_value = {"id": "newfolder123"}
+    mock_files.create.return_value = mock_create
+    mock_service.files.return_value = mock_files
+
+    find_or_create_folder(mock_service, "NewFolder")
+
+    call_kwargs = mock_files.create.call_args.kwargs
+    assert call_kwargs.get("supportsAllDrives") is True
 
 
 def test_upload_file_with_folder_id(tmp_path: Path, mocker: MockerFixture) -> None:
@@ -133,3 +169,25 @@ def test_upload_file_adds_timestamp_to_name(tmp_path: Path, mocker: MockerFixtur
     assert file_metadata["name"].startswith("report_")
     # Verify it ends with the correct extension
     assert file_metadata["name"].endswith(".docx")
+
+
+def test_upload_file_passes_api_params(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test that uploading a file passes supportsAllDrives."""
+    test_file = tmp_path / "report.docx"
+    test_file.write_bytes(b"fake docx")
+
+    mock_service = mocker.Mock()
+    mock_files = mocker.Mock()
+
+    mock_create = mocker.Mock()
+    mock_create.execute.return_value = {
+        "id": "file123",
+        "webViewLink": "https://docs.google.com/document/d/file123/edit",
+    }
+    mock_files.create.return_value = mock_create
+    mock_service.files.return_value = mock_files
+
+    upload_file(mock_service, test_file, "1a2b3c4d5e6f7g8h9i0j")
+
+    call_kwargs = mock_files.create.call_args.kwargs
+    assert call_kwargs.get("supportsAllDrives") is True
