@@ -102,8 +102,8 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
                 q=query,
                 spaces="drive",
                 fields="files(id, name)",
-                supportsAllDrives=True,  # ADD THIS
-                includeItemsFromAllDrives=True,  # ADD THIS
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
             )
             .execute()
         )
@@ -125,7 +125,7 @@ def find_or_create_folder(service: Any, folder_name: str, parent_id: str | None 
             .create(
                 body=file_metadata,
                 fields="id",
-                supportsAllDrives=True,  # ADD THIS
+                supportsAllDrives=True,
             )
             .execute()
         )
@@ -192,7 +192,7 @@ def upload_file(service: Any, file_path: Path, folder_id: str) -> tuple[str, str
                 body=file_metadata,
                 media_body=media,
                 fields="id, webViewLink",
-                supportsAllDrives=True,  # ADD THIS
+                supportsAllDrives=True,
             )
             .execute()
         )
